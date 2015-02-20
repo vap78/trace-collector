@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Log Report</title>
+
+<style type="text/css">
+
+table {
+	border-spacing: 0px;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+table tr th {
+	background-color: #CCCCCC;
+	border:  1px;
+	border-color: #000000;
+	border-style: solid;
+	padding-left: 5px;
+	padding-bottom: 1px;
+	padding-top: 1px;
+}
+
+table tr td {
+	border:  1px;
+	border-color: #000000;
+	border-style: solid;
+	padding-left: 5px;
+	padding-bottom: 1px;
+	padding-top: 1px;
+}
+
+tr.error {
+	background-color: #CC0000;
+}
+
+td.ACH {
+	display: none;
+}
+
+th.ACH {
+	display: none;
+}
+
+td.component {
+	display: none;
+}
+
+th.component {
+	display: none;
+}
+
+td.tenantAlias {
+	display: none;
+}
+
+th.tenantAlias {
+	display: none;
+}
+
+td.bundleName {
+	display: none;
+}
+
+th.bundleName {
+	display: none;
+}
+
+th.text {
+	width: 400px; 
+	word-wrap:break-word;
+}
+
+td.text {
+	width: 400px; 
+	word-wrap: break-word;
+}
+</style>
+
+</head>
+<body>
+${header}
+<table>
+${table}
+</table>
+</body>
+</html>
