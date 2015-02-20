@@ -1,4 +1,4 @@
-package com.sap.cloud.logging.diagtool;
+package personal.vap78.logging.diagtool;
 
 import java.util.List;
 import java.util.Properties;

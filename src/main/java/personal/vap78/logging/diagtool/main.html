@@ -10,6 +10,8 @@
 	  padding: 0px;
 	  width: 800px;
 	  padding-top: 10px;
+	  margin-left: auto;
+	  margin-right:auto;
 	}
 	table.locations {
 	  width: 100%;
@@ -28,11 +30,14 @@
 </style>
 
 <script type="text/javascript">
-
+  $(".start").onClick = funcion() {
+	  alert("clicked");
+	  
+  }
 </script>
 
 </head>
-<body style="margin-left: auto; margin-right:auto">	
+<body>	
 	<div>Connected to: ${host} Account: ${account} Application: ${application} User: ${user}</div>
 	<hr/>
 	<div>
@@ -43,12 +48,6 @@
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<button class="start" name="start">Start Collecting Traces</button>
 	 </div>
-	 <div>
-	 	Trace locations
-	 	<table class="locations">
-	 		<tr><td>text1</td></tr>
-	 		<tr><td>text2</td></tr>
-	 	</table>
-	 </div>
+	 
 </body>
 </html>
