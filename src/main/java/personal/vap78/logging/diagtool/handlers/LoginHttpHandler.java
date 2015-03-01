@@ -1,0 +1,194 @@
+package personal.vap78.logging.diagtool.handlers;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
+import org.glassfish.grizzly.http.Cookie;
+import org.glassfish.grizzly.http.Method;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.server.Response;
+import org.glassfish.grizzly.http.util.HttpStatus;
+
+import personal.vap78.logging.diagtool.AbstractLogCommand;
+import personal.vap78.logging.diagtool.CommandExecutionException;
+import personal.vap78.logging.diagtool.ListLogFilesCommand;
+import personal.vap78.logging.diagtool.LocalServer;
+import personal.vap78.logging.diagtool.LogFileDescriptor;
+import personal.vap78.logging.diagtool.Session;
+
+public class LoginHttpHandler extends AbstractHttpHandler {
+
+  public static final String STORED_TIME = "storedTime";
+
+  private static final int THIRTY_MINUTES = 30;
+  
+  private static final String TEMPLATE = readTemplate("login.html");
+  
+  @Override
+  public void service(Request req, Response resp) throws Exception {
+    super.service(req, resp);
+    if (req.getMethod().equals(Method.POST)) {
+      Properties props = new Properties();
+      Map<String, String> params = LocalServer.convertParameterMap(req.getParameterMap());
+      props.putAll(params);
+      
+
+      ListLogFilesCommand command = new ListLogFilesCommand(props);
+      try {
+        BufferedReader reader = command.executeConsoleTool();
+        Map<String, LogFileDescriptor> logFiles = command.parseListLogsOutput(reader);
+
+        UUID uuid = LocalServer.createUUID();
+        Session session = Session.createSession(uuid.toString(), props);
+        session.setLogs(logFiles);
+
+        storeProperties(session);
+
+        Cookie sessionCookie = new Cookie(SESSION_ID, uuid.toString());
+        sessionCookie.setMaxAge(THIRTY_MINUTES);
+        resp.addCookie(sessionCookie);
+        resp.sendRedirect("/main");
+      } catch (CommandExecutionException e) {
+        if (e.getCommand().getConsoleOutput() != null) {
+          printFailedLogin(resp);
+          return;
+        }
+      }
+    } else if (req.getMethod().equals(Method.GET)) {
+      String content = TEMPLATE;
+      List<Session> sessions = readPreviousSessions();
+      Session lastSession = null;
+      StringBuilder sessionsSelectBuilder = new StringBuilder();
+      StringBuilder jsArrayBuilder = new StringBuilder();
+      
+      for (Session s : sessions) {
+        if (lastSession == null) {
+          lastSession = s;
+        } else {
+          String storeTimeStr = s.getProperties().getProperty(STORED_TIME, "-1");
+          String lastSessionStoreTimeStr = lastSession.getProperties().getProperty(STORED_TIME, "-1");
+          if (Long.parseLong(lastSessionStoreTimeStr) < Long.parseLong(storeTimeStr)) {
+            lastSession = s;
+          }
+        }
+      }
+      
+      for (Session s : sessions) {
+        sessionsSelectBuilder.append("<option value=\"");
+        sessionsSelectBuilder.append(s.getLongName());
+        sessionsSelectBuilder.append("\"");
+        if (s == lastSession) {
+          sessionsSelectBuilder.append(" selected>");
+        } else {
+          sessionsSelectBuilder.append(">");
+        }
+        sessionsSelectBuilder.append("Host: ");
+        sessionsSelectBuilder.append(s.getHost());
+        sessionsSelectBuilder.append(" Account: ");
+        sessionsSelectBuilder.append(s.getAccount());
+        sessionsSelectBuilder.append(" Application: ");
+        sessionsSelectBuilder.append(s.getApplication());
+        sessionsSelectBuilder.append("</option>\n");
+        
+      //sessions['xyz'] = {sdkPath: '/test', host: 'host', account: 'account1', application: 'app', user: 'user', proxy: 'proxy'};
+        jsArrayBuilder.append("sessions['").append(s.getLongName()).append("'] = {sdkPath: '");
+        jsArrayBuilder.append(s.getSDKPath()).append("', host: '").append(s.getHost());
+        jsArrayBuilder.append("', account: '").append(s.getAccount()).append("', application: '");
+        jsArrayBuilder.append(s.getApplication()).append("', user: '").append(s.getUser());
+        jsArrayBuilder.append("', proxy: '").append(s.getProxy()).append("', proxyUser: '").append(s.getProxyUser());
+        jsArrayBuilder.append("'};");
+      }
+      content = content.replace("//${sessions.js}", jsArrayBuilder.toString());
+      content = content.replace("${sessions}", sessionsSelectBuilder.toString());
+      if (lastSession == null) {
+        content = content.replace("${host}", "").replace("${account}", "")
+            .replace("${application}", "").replace("${user}", "").replace("${proxy}", "")
+            .replace("${proxyUser}", "");
+      } else {
+        content = content.replace("${host}", lastSession.getHost())
+            .replace("${account}", lastSession.getAccount())
+            .replace("${application}", lastSession.getApplication())
+            .replace("${user}", lastSession.getUser())
+            .replace("${sdkPath}", lastSession.getSDKPath())
+            .replace("${proxy}", lastSession.getProxy())
+            .replace("${proxyUser}", lastSession.getProxyUser());
+      }
+      
+      resp.getWriter().write(content);
+      resp.getWriter().flush();
+    } else {
+      resp.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+    }
+  }
+
+  private List<Session> readPreviousSessions() throws IOException {
+    List<Session> toReturn = new ArrayList<>();
+    File root = new File(".");
+    String[] localFiles = root.list();
+    
+    for(String fileName : localFiles) {
+      File file = new File(root, fileName);
+      
+      if (!file.isDirectory() && fileName.endsWith(".session") && fileName.split("_").length == 3) {
+        FileInputStream input = null;
+        try {
+          Properties props = new Properties();
+          input = new FileInputStream(file);
+          props.load(new InputStreamReader(input, UTF_8));
+          if (props.getProperty(AbstractLogCommand.HOST_PARAM) != null &&
+              props.getProperty(AbstractLogCommand.ACCOUNT_PARAM) != null &&
+              props.getProperty(AbstractLogCommand.APPLICATION_PARAM) != null) {
+            Session session = new Session(null, props);
+            toReturn.add(session);
+          }
+        } catch (Exception e) {
+          System.out.println("Warning: unable to parse file: " + fileName + ". Ignoring it.");
+          e.printStackTrace();
+        } finally {
+          if (input != null) {
+            input.close();
+          }
+        }
+      }
+    }
+    
+    return toReturn;
+  }
+
+  private void storeProperties(Session session) throws IOException {
+    Properties props = (Properties) session.getProperties().clone();
+    props.remove(AbstractLogCommand.PASSWORD_PARAM);
+    props.setProperty(STORED_TIME, String.valueOf(System.currentTimeMillis()));
+    
+    String host = session.getHost();
+    String account = session.getAccount();
+    String application = session.getApplication();
+
+    String fileName = host + "_" + account + "_" + application + ".session";
+    
+    FileOutputStream fos = null;
+    try {
+      fos = new FileOutputStream(fileName);
+      props.store(new OutputStreamWriter(fos, UTF_8), null);
+    } finally {
+      if (fos != null) {
+        fos.close();
+      }
+    }
+  }
+
+  private void printFailedLogin(Response resp) {
+    // TODO Auto-generated method stub
+
+  }
+}

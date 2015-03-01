@@ -17,9 +17,12 @@ public abstract class AbstractLogCommand {
   public static final String PASSWORD_PARAM = "password";
   public static final String LEVEL_PARAM = "level";
   public static final String LOGGERS_PARAM = "loggers";
-  public static final String SDK_PATH_PARAM = "sdk.path";
+  public static final String SDK_PATH_PARAM = "sdkPath";
   public static final String HTTP_TRACE = "http_trace";
   public static final String LJS_TRACE = "ljs_trace";
+  public static final String PROXY_PARAM = "proxy";
+  public static final String PROXY_USER_PARAM = "proxyUser";
+  public static final String PROXY_PASSWORD_PARAM = "proxyPassword";
 
   protected StringBuilder consoleOutput;
   protected Properties props;

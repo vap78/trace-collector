@@ -13,6 +13,10 @@ public class Session {
     return sessions.get(id);
   }
   
+  public static void deleteSession(String id) {
+    sessions.remove(id);
+  }
+  
   public static Session createSession(String id, Properties props) {
     Session session = new Session(id, props);
     sessions.put(id, session);
@@ -48,5 +52,46 @@ public class Session {
   
   public boolean isValid() {
     return (System.currentTimeMillis() - creationTime) < THIRTY_MINUTES;
+  }
+  
+  public String getHost() {
+    return properties.getProperty(AbstractLogCommand.HOST_PARAM);
+  }
+  
+  public String getAccount() {
+    return properties.getProperty(AbstractLogCommand.ACCOUNT_PARAM);
+  }
+  
+  public String getApplication() {
+    return properties.getProperty(AbstractLogCommand.APPLICATION_PARAM);
+  }
+  
+  public String getUser() {
+    return properties.getProperty(AbstractLogCommand.USER_PARAM);
+  }
+  
+  public String getPassword() {
+    return properties.getProperty(AbstractLogCommand.PASSWORD_PARAM);
+  }
+  
+  public String getSDKPath() {
+    return properties.getProperty(AbstractLogCommand.SDK_PATH_PARAM);
+  }
+  
+  public String getProxy() {
+    return properties.getProperty(AbstractLogCommand.PROXY_PARAM, "");
+  }
+  
+  public String getProxyUser() {
+    return properties.getProperty(AbstractLogCommand.PROXY_USER_PARAM, "");
+  }
+  
+  public String getProxyPassword() {
+    return properties.getProperty(AbstractLogCommand.PROXY_PASSWORD_PARAM, "");
+    
+  }
+
+  public String getLongName() {
+    return getHost() + "_" + getAccount() + "_" + getApplication();
   }
 }
