@@ -28,6 +28,7 @@ input {
 
 .shown {
 	display: block;
+	color: red;
 }
 </style>
 <script type="text/javascript" src="jquery-1.11.2.min.js"></script>
@@ -75,7 +76,7 @@ input {
 </script>
 </head>
 <body style="width: 800px; margin-left: auto; margin-right:auto">
-	<div id="errormessage" class="hidden"></div>
+	${errorMessage}
 	<p>Select previous session: <select name="sessions">
 	<option value="empty"></option> ${sessions}</select></p>
 	<form method="POST" action="doLogin" name="loginForm" onsubmit="return verifyForm()">

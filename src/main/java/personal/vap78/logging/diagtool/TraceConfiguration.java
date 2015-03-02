@@ -14,8 +14,9 @@ public class TraceConfiguration {
 
   private static Map<String, TraceConfiguration> configurations = new HashMap<>();
   
-  public static void addFromDirectory(File directory) throws IOException {
+  public static synchronized void addFromDirectory(File directory) throws IOException {
     String[] files = directory.list();
+    configurations.clear();
     
     for (String name : files) {
       if (name.startsWith("locations.")) {
@@ -86,5 +87,15 @@ public class TraceConfiguration {
   
   public void setName(String name) {
     this.name = name;
+  }
+  
+  public String getLocationsAsString() {
+    StringBuilder toReturn = new StringBuilder();
+    for (String s : locations) {
+      toReturn.append(s);
+      toReturn.append("\n");
+    }
+    
+    return toReturn.toString();
   }
 }

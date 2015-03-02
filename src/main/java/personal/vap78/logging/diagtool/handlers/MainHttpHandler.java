@@ -1,6 +1,9 @@
 package personal.vap78.logging.diagtool.handlers;
 
-import java.util.Collection;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
@@ -14,12 +17,13 @@ public class MainHttpHandler extends AbstractHttpHandler {
   
   @Override
   public void service(Request req, Response resp) throws Exception {
+    super.service(req, resp);
+    
     Session session = getSession(req, resp);
     if (session == null) {
-      resp.sendRedirect("/login.html");
+      resp.sendRedirect(DO_LOGIN_ALIAS);
       return;
     }
-    super.service(req, resp);
 
     String host = session.getHost();
     String account = session.getAccount();
@@ -28,19 +32,37 @@ public class MainHttpHandler extends AbstractHttpHandler {
     
     String content = TEMPLATE.replace("${host}", host).replace("${account}", account)
          .replace("${application}", application).replace("${user}", user);
-    
-    Collection<String> traceConfigurations = TraceConfiguration.getAllConfigurationNames(); 
-    StringBuilder builder = new StringBuilder();
-    for (String cfgName : traceConfigurations) {
-      builder.append("<option value=\">");
-      builder.append(cfgName);
-      builder.append("\">");
-      builder.append(cfgName);
-      builder.append("</option>");
-      builder.append("\n");
+    TraceConfiguration.addFromDirectory(new File("."));
+    ArrayList<String> traceConfigurations = new ArrayList<>(TraceConfiguration.getAllConfigurationNames());
+    if (traceConfigurations.size() > 0) {
+      Collections.sort(traceConfigurations);
+      StringBuilder optionsBuilder = new StringBuilder();
+      StringBuilder jsArrayBuilder = new StringBuilder();
+      //traceConfigs['security'] = ['test1', 'test2'];
+
+      for (String cfgName : traceConfigurations) {
+        optionsBuilder.append("<option value=\"").append(cfgName).append("\">");
+        optionsBuilder.append(cfgName).append("</option>").append("\n");
+        jsArrayBuilder.append("traceConfigs['").append(cfgName).append("'] = ['");
+        TraceConfiguration cfg = TraceConfiguration.getByName(cfgName);
+        List<String> locations = cfg.getLocations();
+        for (int i = 0; i < locations.size(); i++) {
+          jsArrayBuilder.append(locations.get(i)).append("'");
+          if (i == locations.size() - 1) {
+            jsArrayBuilder.append("];\n");
+          } else {
+            jsArrayBuilder.append(", '");
+          }
+        }
+      }
+      content = content.replace("${incidents}", optionsBuilder.toString());
+      content = content.replace("//${jsLocations}", jsArrayBuilder.toString());
+      content = content.replace("${locations}",  TraceConfiguration.getByName(traceConfigurations.get(0)).getLocationsAsString());
+    } else {
+      content = content.replace("${incidents}", "");
     }
-    content = content.replace("${incidents}", builder.toString());
     
     resp.getWriter().write(content);
+    resp.getWriter().flush();
   }
 }

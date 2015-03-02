@@ -45,12 +45,10 @@ public class HtmlReportGenerator {
     BufferedReader templateReader = null;
 
     BufferedReader ljsLogReader = null;
-    // BufferedReader httpTraceReader = new BufferedReader(new
-    // FileReader(httpTracePath));
     try {
       ljsOutput = new PrintStream(new File(ljsReport));
       templateReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("template.html")));
-      ;
+
       ljsLogReader = new BufferedReader(new FileReader(ljsLogPath));
       parseHeader(ljsLogReader);
 

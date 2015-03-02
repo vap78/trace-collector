@@ -30,7 +30,7 @@ public class LoginHttpHandler extends AbstractHttpHandler {
 
   public static final String STORED_TIME = "storedTime";
 
-  private static final int THIRTY_MINUTES = 30;
+  private static final int THIRTY_MINUTES = 30*60;
   
   private static final String TEMPLATE = readTemplate("login.html");
   
@@ -38,39 +38,55 @@ public class LoginHttpHandler extends AbstractHttpHandler {
   public void service(Request req, Response resp) throws Exception {
     super.service(req, resp);
     if (req.getMethod().equals(Method.POST)) {
-      Properties props = new Properties();
-      Map<String, String> params = LocalServer.convertParameterMap(req.getParameterMap());
-      props.putAll(params);
-      
-
-      ListLogFilesCommand command = new ListLogFilesCommand(props);
-      try {
-        BufferedReader reader = command.executeConsoleTool();
-        Map<String, LogFileDescriptor> logFiles = command.parseListLogsOutput(reader);
-
-        UUID uuid = LocalServer.createUUID();
-        Session session = Session.createSession(uuid.toString(), props);
-        session.setLogs(logFiles);
-
-        storeProperties(session);
-
-        Cookie sessionCookie = new Cookie(SESSION_ID, uuid.toString());
-        sessionCookie.setMaxAge(THIRTY_MINUTES);
-        resp.addCookie(sessionCookie);
-        resp.sendRedirect("/main");
-      } catch (CommandExecutionException e) {
-        if (e.getCommand().getConsoleOutput() != null) {
-          printFailedLogin(resp);
-          return;
-        }
-      }
+      processLogon(req, resp);
     } else if (req.getMethod().equals(Method.GET)) {
-      String content = TEMPLATE;
-      List<Session> sessions = readPreviousSessions();
-      Session lastSession = null;
-      StringBuilder sessionsSelectBuilder = new StringBuilder();
-      StringBuilder jsArrayBuilder = new StringBuilder();
-      
+      logonScreen(null, null, resp);
+    } else {
+      resp.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+    }
+  }
+
+  private void processLogon(Request req, Response resp) throws IOException, Exception {
+    Properties props = new Properties();
+    Map<String, String> params = LocalServer.convertParameterMap(req.getParameterMap());
+    props.putAll(params);
+    
+
+    UUID uuid = LocalServer.createUUID();
+    Session session = Session.createSession(uuid.toString(), props);
+
+    ListLogFilesCommand command = new ListLogFilesCommand(session);
+    try {
+      BufferedReader reader = command.executeConsoleTool();
+      Map<String, LogFileDescriptor> logFiles = command.parseListLogsOutput(reader);
+
+      session.setLogs(logFiles);
+
+      storeProperties(session);
+
+      Cookie sessionCookie = new Cookie(SESSION_ID, uuid.toString());
+      sessionCookie.setMaxAge(THIRTY_MINUTES);
+      resp.addCookie(sessionCookie);
+      resp.sendRedirect("/main");
+    } catch (CommandExecutionException e) {
+      Session.deleteSession(uuid.toString());
+      printFailedLogin(props, resp);
+    }
+  }
+
+  private void logonScreen(String errorMessage, Properties previousSessionProps, Response resp) throws IOException {
+    String content = TEMPLATE;
+    if (errorMessage == null) {
+      content = content.replace("${errorMessage}", "<div id=\"errormessage\" class=\"hidden\"></div>");
+    } else {
+      content = content.replace("${errorMessage}", "<div id=\"errormessage\" class=\"shown\">" + errorMessage + "</div>");
+    }
+    List<Session> sessions = readPreviousSessions();
+    Session lastSession = null;
+    StringBuilder sessionsSelectBuilder = new StringBuilder();
+    StringBuilder jsArrayBuilder = new StringBuilder();
+    
+    if (previousSessionProps == null) {
       for (Session s : sessions) {
         if (lastSession == null) {
           lastSession = s;
@@ -82,53 +98,53 @@ public class LoginHttpHandler extends AbstractHttpHandler {
           }
         }
       }
-      
-      for (Session s : sessions) {
-        sessionsSelectBuilder.append("<option value=\"");
-        sessionsSelectBuilder.append(s.getLongName());
-        sessionsSelectBuilder.append("\"");
-        if (s == lastSession) {
-          sessionsSelectBuilder.append(" selected>");
-        } else {
-          sessionsSelectBuilder.append(">");
-        }
-        sessionsSelectBuilder.append("Host: ");
-        sessionsSelectBuilder.append(s.getHost());
-        sessionsSelectBuilder.append(" Account: ");
-        sessionsSelectBuilder.append(s.getAccount());
-        sessionsSelectBuilder.append(" Application: ");
-        sessionsSelectBuilder.append(s.getApplication());
-        sessionsSelectBuilder.append("</option>\n");
-        
-      //sessions['xyz'] = {sdkPath: '/test', host: 'host', account: 'account1', application: 'app', user: 'user', proxy: 'proxy'};
-        jsArrayBuilder.append("sessions['").append(s.getLongName()).append("'] = {sdkPath: '");
-        jsArrayBuilder.append(s.getSDKPath()).append("', host: '").append(s.getHost());
-        jsArrayBuilder.append("', account: '").append(s.getAccount()).append("', application: '");
-        jsArrayBuilder.append(s.getApplication()).append("', user: '").append(s.getUser());
-        jsArrayBuilder.append("', proxy: '").append(s.getProxy()).append("', proxyUser: '").append(s.getProxyUser());
-        jsArrayBuilder.append("'};");
-      }
-      content = content.replace("//${sessions.js}", jsArrayBuilder.toString());
-      content = content.replace("${sessions}", sessionsSelectBuilder.toString());
-      if (lastSession == null) {
-        content = content.replace("${host}", "").replace("${account}", "")
-            .replace("${application}", "").replace("${user}", "").replace("${proxy}", "")
-            .replace("${proxyUser}", "");
-      } else {
-        content = content.replace("${host}", lastSession.getHost())
-            .replace("${account}", lastSession.getAccount())
-            .replace("${application}", lastSession.getApplication())
-            .replace("${user}", lastSession.getUser())
-            .replace("${sdkPath}", lastSession.getSDKPath())
-            .replace("${proxy}", lastSession.getProxy())
-            .replace("${proxyUser}", lastSession.getProxyUser());
-      }
-      
-      resp.getWriter().write(content);
-      resp.getWriter().flush();
     } else {
-      resp.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+      lastSession = new Session(null, previousSessionProps);
     }
+    
+    for (Session s : sessions) {
+      sessionsSelectBuilder.append("<option value=\"");
+      sessionsSelectBuilder.append(s.getLongName());
+      sessionsSelectBuilder.append("\"");
+      if (s == lastSession) {
+        sessionsSelectBuilder.append(" selected>");
+      } else {
+        sessionsSelectBuilder.append(">");
+      }
+      sessionsSelectBuilder.append("Host: ");
+      sessionsSelectBuilder.append(s.getHost());
+      sessionsSelectBuilder.append(" Account: ");
+      sessionsSelectBuilder.append(s.getAccount());
+      sessionsSelectBuilder.append(" Application: ");
+      sessionsSelectBuilder.append(s.getApplication());
+      sessionsSelectBuilder.append("</option>\n");
+      
+    //sessions['xyz'] = {sdkPath: '/test', host: 'host', account: 'account1', application: 'app', user: 'user', proxy: 'proxy'};
+      jsArrayBuilder.append("sessions['").append(s.getLongName()).append("'] = {sdkPath: '");
+      jsArrayBuilder.append(s.getSDKPath()).append("', host: '").append(s.getHost());
+      jsArrayBuilder.append("', account: '").append(s.getAccount()).append("', application: '");
+      jsArrayBuilder.append(s.getApplication()).append("', user: '").append(s.getUser());
+      jsArrayBuilder.append("', proxy: '").append(s.getProxy()).append("', proxyUser: '").append(s.getProxyUser());
+      jsArrayBuilder.append("'};");
+    }
+    content = content.replace("//${sessions.js}", jsArrayBuilder.toString());
+    content = content.replace("${sessions}", sessionsSelectBuilder.toString());
+    if (lastSession == null) {
+      content = content.replace("${host}", "").replace("${account}", "")
+          .replace("${application}", "").replace("${user}", "").replace("${proxy}", "")
+          .replace("${proxyUser}", "");
+    } else {
+      content = content.replace("${host}", lastSession.getHost())
+          .replace("${account}", lastSession.getAccount())
+          .replace("${application}", lastSession.getApplication())
+          .replace("${user}", lastSession.getUser())
+          .replace("${sdkPath}", lastSession.getSDKPath())
+          .replace("${proxy}", lastSession.getProxy())
+          .replace("${proxyUser}", lastSession.getProxyUser());
+    }
+    
+    resp.getWriter().write(content);
+    resp.getWriter().flush();
   }
 
   private List<Session> readPreviousSessions() throws IOException {
@@ -187,8 +203,7 @@ public class LoginHttpHandler extends AbstractHttpHandler {
     }
   }
 
-  private void printFailedLogin(Response resp) {
-    // TODO Auto-generated method stub
-
+  private void printFailedLogin(Properties lastSession, Response resp) throws IOException {
+    logonScreen("Logon failed", lastSession, resp);
   }
 }

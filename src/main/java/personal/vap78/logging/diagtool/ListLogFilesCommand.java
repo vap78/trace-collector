@@ -13,8 +13,8 @@ public class ListLogFilesCommand extends AbstractLogCommand {
   public static final String LIST_LOGS_COMMAND = "list-logs";
   
   
-  public ListLogFilesCommand(Properties props) {
-    super(props);
+  public ListLogFilesCommand(Session session) {
+    super(session);
   }
 
   @Override
@@ -67,7 +67,6 @@ public class ListLogFilesCommand extends AbstractLogCommand {
   }
   
   private String getType(String fileName) {
-    // TODO Auto-generated method stub
     if (fileName.startsWith(LJS_TRACE)) {
       return LJS_TRACE;
     } else if (fileName.startsWith(HTTP_TRACE)) {

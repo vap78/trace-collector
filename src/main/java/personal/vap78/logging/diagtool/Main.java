@@ -26,7 +26,7 @@ public class Main {
     if (propsFile.exists() && propsFile.isFile()) {
       props.load(new FileReader(propsFile));
     }
-
+    
     LocalServer server = new LocalServer();
     
     server.start();

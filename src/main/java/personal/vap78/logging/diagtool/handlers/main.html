@@ -27,27 +27,46 @@
 		height: 40px;
 		background-color: orange;
 	}
+	span.bold {
+		font-weight: bold; 
+	}
 </style>
 
-<script type="text/javascript">
-  $(".start").onClick = funcion() {
-	  alert("clicked");
-	  
-  }
-</script>
 
 </head>
 <body>	
-	<div>Connected to: ${host} Account: ${account} Application: ${application} User: ${user}</div>
+	<div>Connected to: <span class="bold">${host}</span> Account: <span class="bold">${account}</span> 
+	Application: <span class="bold">${application}</span> <span class="bold">User: ${user}</span></div>
 	<hr/>
 	<div>
 		Incident Type: 
 		<select name="incident" id="incident">
 		    ${incidents}
 		</select>
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<button class="start" name="start">Start Collecting Traces</button>
+		<button class="start" id="startTraces" name="start">Start Collecting Traces</button>
+		<textarea rows="20" cols="70" id="traceLocations">${locations}</textarea>
+		
 	 </div>
 	 
+<script type="text/javascript">
+  var traceConfigs = {};
+  //${jsLocations}
+  $("#incident").change(function(e) {
+	  var traceConfig = traceConfigs[e.target.value];
+	  var areaContent = '';
+	  for (var i = 0; i < traceConfig.length; i++) {
+		  areaContent += traceConfig[i];
+		  if (i < traceConfig.length - 1) {
+			  areaContent += "\n"
+		  }
+	  }
+	  
+	  $("#traceLocations").val(areaContent);
+  });
+  
+  $("#startTraces").click(function() {
+	 alert("clicked"); 
+  });
+</script>
 </body>
 </html>

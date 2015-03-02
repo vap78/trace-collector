@@ -25,13 +25,13 @@ public abstract class AbstractLogCommand {
   public static final String PROXY_PASSWORD_PARAM = "proxyPassword";
 
   protected StringBuilder consoleOutput;
-  protected Properties props;
+  protected Session session;
   protected List<String> command;
   private String executableRoot;
   private String executablePath;
   
-  public AbstractLogCommand(Properties props) {
-    this.props = props;
+  public AbstractLogCommand(Session session) {
+    this.session = session;
     command = new LinkedList<>();
     determinePaths();
   }
@@ -92,11 +92,11 @@ public abstract class AbstractLogCommand {
   protected void addCommonCommandParameters() {
     command.clear();
 
-    String host = props.getProperty(HOST_PARAM);
-    String account = props.getProperty(ACCOUNT_PARAM);
-    String application = props.getProperty(APPLICATION_PARAM);
-    String user = props.getProperty(USER_PARAM);
-    String password = props.getProperty(PASSWORD_PARAM);
+    String host = session.getHost();
+    String account = session.getAccount();
+    String application = session.getApplication();
+    String user = session.getUser();
+    String password = session.getPassword();
 
     System.out.println("Started with following parameters:");
     System.out.println("Landscape host: " + host);
@@ -117,7 +117,7 @@ public abstract class AbstractLogCommand {
   }  
   
   private void determinePaths() {
-    String sdkPath = props.getProperty(SDK_PATH_PARAM);
+    String sdkPath = session.getSDKPath();
 
     executableRoot = sdkPath + File.separator + "tools";
     executablePath = executableRoot;

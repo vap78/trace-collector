@@ -75,7 +75,7 @@ public class Session {
   }
   
   public String getSDKPath() {
-    return properties.getProperty(AbstractLogCommand.SDK_PATH_PARAM);
+    return properties.getProperty(AbstractLogCommand.SDK_PATH_PARAM, "");
   }
   
   public String getProxy() {

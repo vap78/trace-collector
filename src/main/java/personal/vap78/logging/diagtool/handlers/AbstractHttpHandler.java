@@ -12,6 +12,7 @@ import personal.vap78.logging.diagtool.Session;
 
 public class AbstractHttpHandler extends HttpHandler {
 
+  public static final String DO_LOGIN_ALIAS = "/doLogin";
   public static final String TEXT_HTML = "text/html";
   public static final String UTF_8 = "UTF-8";
   public static final String SESSION_ID = "sessionId";
@@ -51,15 +52,15 @@ public class AbstractHttpHandler extends HttpHandler {
   protected Session getSession(Request req, Response resp) throws IOException {
     Cookie cookie = getSessionCookie(req);
     if (cookie == null) {
-      resp.sendRedirect("login.html");
       return null;
     }
     Session session = Session.getById(cookie.getValue());
-    if (!session.isValid()) {
+    if (session == null || !session.isValid()) {
       cookie.setMaxAge(0);
-      Session.deleteSession(session.getId());
+      if (session != null) {
+        Session.deleteSession(session.getId());
+      }
       resp.addCookie(cookie);
-      resp.sendRedirect("login.html");
       return null;
     }
     
@@ -68,6 +69,10 @@ public class AbstractHttpHandler extends HttpHandler {
 
   private Cookie getSessionCookie(Request req) {
     Cookie[] allCookies = req.getCookies();
+    
+    if (allCookies == null) {
+      return null;
+    }
     
     for (Cookie cookie : allCookies) {
       if (cookie.getName().equals(SESSION_ID)) {
