@@ -20,7 +20,7 @@ public class AbstractHttpHandler extends HttpHandler {
   protected static String readTemplate(String resource) {
     InputStream input = null;
     try {
-      input = MainHttpHandler.class.getResourceAsStream(resource);
+      input = AbstractHttpHandler.class.getResourceAsStream(resource);
       byte[] buffer = new byte[1024];
       int counter = 0; 
       StringBuilder builder = new StringBuilder();
@@ -30,8 +30,7 @@ public class AbstractHttpHandler extends HttpHandler {
       }
       return builder.toString();
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException("Failed to load template");
+      throw new RuntimeException("Failed to load template", e);
     } finally {
       if (input != null) {
         try {
