@@ -184,11 +184,13 @@ public class LoginHttpHandlerTest extends AbstractHandlerTest {
     PowerMock.expectNew(ListLogFilesCommand.class, EasyMock.anyObject()).andReturn(mockListLogs);
     
     if (failLogin) {
-      EasyMock.expect(mockListLogs.executeConsoleTool()).andThrow(new CommandExecutionException(mockListLogs, "testing failed login"));
+      mockListLogs.executeConsoleTool();
+      EasyMock.expectLastCall().andThrow(new CommandExecutionException(mockListLogs, "testing failed login"));
     } else {
-      BufferedReader mockReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(new byte[] {})));
-      EasyMock.expect(mockListLogs.executeConsoleTool()).andReturn(mockReader);
-      EasyMock.expect(mockListLogs.parseListLogsOutput(mockReader)).andReturn(new HashMap<String, LogFileDescriptor>());
+      mockListLogs.executeConsoleTool();
+      EasyMock.expectLastCall();
+      EasyMock.expect(mockListLogs.getConsoleOutput()).andReturn("");
+      EasyMock.expect(mockListLogs.parseListLogsOutput()).andReturn(new HashMap<String, LogFileDescriptor>());
       
       FileOutputStream mockFos = EasyMock.createMock(FileOutputStream.class);
       PowerMock.expectNew(FileOutputStream.class, "host1_account1_application1.session").andReturn(mockFos);

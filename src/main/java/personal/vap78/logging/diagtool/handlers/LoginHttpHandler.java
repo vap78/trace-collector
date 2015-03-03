@@ -57,8 +57,8 @@ public class LoginHttpHandler extends AbstractHttpHandler {
 
     ListLogFilesCommand command = new ListLogFilesCommand(session);
     try {
-      BufferedReader reader = command.executeConsoleTool();
-      Map<String, LogFileDescriptor> logFiles = command.parseListLogsOutput(reader);
+      command.executeConsoleTool();
+      Map<String, LogFileDescriptor> logFiles = command.parseListLogsOutput();
 
       session.setLogs(logFiles);
 

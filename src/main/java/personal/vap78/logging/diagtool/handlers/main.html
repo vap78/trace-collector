@@ -5,68 +5,98 @@
 <title>HCP Trace Collector Main Page</title>
 <script type="text/javascript" src="jquery-1.11.2.min.js"></script>
 <style type="text/css">
-	body {
-	  margin:0px;
-	  padding: 0px;
-	  width: 800px;
-	  padding-top: 10px;
-	  margin-left: auto;
-	  margin-right:auto;
-	}
-	table.locations {
-	  width: 100%;
-	}
-	
-	table.locations tr:hover {
-	  background-color: #BBBBBB
-	}
-	
-	button.start {
-		float: right;
-		width: 150px;
-		height: 40px;
-		background-color: orange;
-	}
-	span.bold {
-		font-weight: bold; 
-	}
+body {
+	margin: 0px;
+	padding: 0px;
+	width: 800px;
+	padding-top: 10px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table.locations {
+	width: 100%;
+}
+
+table.locations tr:hover {
+	background-color: #BBBBBB
+}
+
+button.start {
+	float: right;
+	width: 150px;
+	height: 40px;
+	background-color: orange;
+}
+
+span.bold {
+	font-weight: bold;
+}
+
+#dimScreen {
+	position: absolute;
+	margin: 0px; 
+	padding : 0px; 
+	width : 800px; 
+	height: 80%;
+	padding-top : 10px;
+	margin-left : auto; 
+	margin-right : auto;
+	z-index: 5;
+	display: none;
+	background: rgba(255, 255, 255, 0.5);
+}
 </style>
 
 
 </head>
-<body>	
-	<div>Connected to: <span class="bold">${host}</span> Account: <span class="bold">${account}</span> 
-	Application: <span class="bold">${application}</span> <span class="bold">User: ${user}</span></div>
-	<hr/>
+<body>
+	<div id="dimScreen"></div>
 	<div>
-		Incident Type: 
-		<select name="incident" id="incident">
-		    ${incidents}
+		Connected to: <span class="bold">${host}</span> Account: <span
+			class="bold">${account}</span> Application: <span class="bold">${application}</span>
+		<span class="bold">User: ${user}</span>
+	</div>
+	<hr />
+	<div>
+		Incident Type: <select name="incident" id="incident">
+			${incidents}
 		</select>
 		<button class="start" id="startTraces" name="start">Start Collecting Traces</button>
 		<textarea rows="20" cols="70" id="traceLocations">${locations}</textarea>
-		
-	 </div>
-	 
-<script type="text/javascript">
-  var traceConfigs = {};
-  //${jsLocations}
-  $("#incident").change(function(e) {
-	  var traceConfig = traceConfigs[e.target.value];
-	  var areaContent = '';
-	  for (var i = 0; i < traceConfig.length; i++) {
-		  areaContent += traceConfig[i];
-		  if (i < traceConfig.length - 1) {
-			  areaContent += "\n"
-		  }
-	  }
-	  
-	  $("#traceLocations").val(areaContent);
-  });
-  
-  $("#startTraces").click(function() {
-	 alert("clicked"); 
-  });
-</script>
+
+	</div>
+
+	<script type="text/javascript">
+		var traceConfigs = {};
+		//${jsLocations}
+		$("#incident").change(function(e) {
+			var traceConfig = traceConfigs[e.target.value];
+			var areaContent = '';
+			for (var i = 0; i < traceConfig.length; i++) {
+				areaContent += traceConfig[i];
+				if (i < traceConfig.length - 1) {
+					areaContent += "\n"
+				}
+			}
+
+			$("#traceLocations").val(areaContent);
+		});
+
+		$("#startTraces").click(function() {
+			$("#dimScreen").show();
+/* 			var data = $('#traceLocations').val();
+			$.ajax({
+				type : 'POST',
+				url : '/doTraces',
+				data : data,
+				success : function(data, status, jqxhr) {
+					alert('started collection of traces');
+					$("#dimScreen").hide();
+				},
+				dataType : 'text'
+			});
+ */		});
+	</script>
 </body>
 </html>

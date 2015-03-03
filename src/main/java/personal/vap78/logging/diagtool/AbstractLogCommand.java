@@ -44,6 +44,7 @@ public abstract class AbstractLogCommand {
         System.out.print(commandPart);
         System.out.print(" ");
         System.out.print("**************");
+        System.out.print(" ");
         i++;
       } else if (commandPart.contains(" ")) {
         System.out.print("\"" + commandPart + "\"");
@@ -54,7 +55,7 @@ public abstract class AbstractLogCommand {
     System.out.println();
   }
   
-  public BufferedReader executeConsoleTool() throws IOException, CommandExecutionException {
+  public void executeConsoleTool() throws IOException, CommandExecutionException {
     addCommonCommandParameters();
     
     addCommandSpecificParameters();
@@ -74,8 +75,12 @@ public abstract class AbstractLogCommand {
     System.out.println("Executing neo console tool operation " + getCommandName());
     System.out.println("=================================================");
     BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-    return input;
+    
+    String line = null;
+    consoleOutput = new StringBuilder();
+    while ((line = input.readLine()) != null) {
+      consoleOutput.append(line).append("\n");
+    }
   }
 
   protected abstract String getCommandName();

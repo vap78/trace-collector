@@ -1,6 +1,7 @@
 package personal.vap78.logging.diagtool;
 
 import java.io.BufferedReader;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,13 +27,12 @@ public class ListLogFilesCommand extends AbstractLogCommand {
   protected void addCommandSpecificParameters() {
   }
   
-  public Map<String, LogFileDescriptor> parseListLogsOutput(BufferedReader reader) throws Exception {
+  public Map<String, LogFileDescriptor> parseListLogsOutput() throws Exception {
     Map<String, LogFileDescriptor> files = new HashMap<String, LogFileDescriptor>();
-    consoleOutput = new StringBuilder();
+    BufferedReader reader = new BufferedReader(new StringReader(getConsoleOutput()));
     String line = null;
     boolean success = false;
     while ((line = reader.readLine()) != null) {
-      consoleOutput.append(line).append("\n");
       System.out.print(">> ");
       System.out.println(line);
       line = line.trim();
