@@ -27,14 +27,17 @@ public class ListLogFilesCommand extends AbstractLogCommand {
   protected void addCommandSpecificParameters() {
   }
   
+  @Override
+  protected boolean isExecutionSuccessful() {
+    return consoleOutput != null && consoleOutput.indexOf("[list-logs] operation is successful.") != -1;
+  }
+  
   public Map<String, LogFileDescriptor> parseListLogsOutput() throws Exception {
     Map<String, LogFileDescriptor> files = new HashMap<String, LogFileDescriptor>();
     BufferedReader reader = new BufferedReader(new StringReader(getConsoleOutput()));
     String line = null;
     boolean success = false;
     while ((line = reader.readLine()) != null) {
-      System.out.print(">> ");
-      System.out.println(line);
       line = line.trim();
       if (line.startsWith("[list-logs] operation is successful")) {
         success = true;
@@ -49,12 +52,12 @@ public class ListLogFilesCommand extends AbstractLogCommand {
         LogFileDescriptor lfd = files.get(type);
         if (lfd == null) {
           lfd = new LogFileDescriptor();
-          lfd.time = time;
-          lfd.type = type;
-          lfd.name = fileName;
-          files.put(lfd.type, lfd);
-        } else if (lfd.type.equals(type) && lfd.time < time) {
-          lfd.name = fileName;
+          lfd.setTime(time);
+          lfd.setType(type);
+          lfd.setName(fileName);
+          files.put(lfd.getType(), lfd);
+        } else if (lfd.getType().equals(type) && lfd.getTime() < time) {
+          lfd.setName(fileName);
         }
       }
     }

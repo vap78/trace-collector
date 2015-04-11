@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import personal.vap78.logging.diagtool.handlers.TraceCollectionInfo;
+
 public class Session {
 
   private static final int THIRTY_MINUTES = 1000*60*30;
@@ -27,7 +29,8 @@ public class Session {
   private long creationTime;
   private Properties properties;
   private Map<String, LogFileDescriptor> logs;
-  
+  private TraceCollectionInfo currentTraceCollectionInfo;
+   
   public Session(String id, Properties properties) {
     this.properties = properties;
     this.creationTime = System.currentTimeMillis();
@@ -93,5 +96,13 @@ public class Session {
 
   public String getLongName() {
     return getHost() + "_" + getAccount() + "_" + getApplication();
+  }
+
+  public TraceCollectionInfo getCurrentTracesCollectionInfo() {
+    return currentTraceCollectionInfo;
+  }
+
+  public void setCurrentTracesId(TraceCollectionInfo info) {
+    this.currentTraceCollectionInfo = info;
   }
 }

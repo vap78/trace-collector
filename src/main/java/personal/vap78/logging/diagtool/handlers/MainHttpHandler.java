@@ -62,6 +62,14 @@ public class MainHttpHandler extends AbstractHttpHandler {
       content = content.replace("${incidents}", "");
     }
     
+    if (session.getCurrentTracesCollectionInfo() != null) {
+      content = content.replace("${statusclass}", "collecting");
+      content = content.replace("${statustext}", "Collecting Traces");
+    } else {
+      content = content.replace("${statusclass}", "idle");
+      content = content.replace("${statustext}", "Not Collecting Traces");
+    }
+    
     resp.getWriter().write(content);
     resp.getWriter().flush();
   }

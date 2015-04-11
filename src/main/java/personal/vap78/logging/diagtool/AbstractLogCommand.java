@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CharSequenceReader;
 
 public abstract class AbstractLogCommand {
 
@@ -87,6 +91,8 @@ public abstract class AbstractLogCommand {
 
   protected abstract void addCommandSpecificParameters();
 
+  protected abstract boolean isExecutionSuccessful();
+  
   public String getConsoleOutput() {
     if (consoleOutput == null) {
       return null;
@@ -103,7 +109,7 @@ public abstract class AbstractLogCommand {
     String user = session.getUser();
     String password = session.getPassword();
 
-    System.out.println("Started with following parameters:");
+    System.out.println("Command " + getCommandName() + " started with following parameters:");
     System.out.println("Landscape host: " + host);
     System.out.println("Account: " + account);
     System.out.println("Appliction: " + application);
@@ -133,11 +139,21 @@ public abstract class AbstractLogCommand {
     }
   }
   
-  protected void readFullyToSysOut(BufferedReader reader) throws Exception {
+  public void printConsoleToSystemOut() throws Exception {
     String line = null;
-    while ((line = reader.readLine()) != null) {
-      System.out.print("[" + this.getClass().getSimpleName() + "]>> ");
-      System.out.println(line);
+    if (consoleOutput == null) {
+      System.out.println("Command output not present");
+      return;
+    }
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new CharSequenceReader(consoleOutput));
+      while ((line = reader.readLine()) != null) {
+        System.out.print("[" + this.getClass().getSimpleName() + "]>> ");
+        System.out.println(line);
+      }
+    } finally {
+      IOUtils.closeQuietly(reader);
     }
   }
 

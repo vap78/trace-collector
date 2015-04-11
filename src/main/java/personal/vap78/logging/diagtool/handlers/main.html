@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title>HCP Trace Collector Main Page</title>
+<link type="text/css" href="animate.css" rel="stylesheet"></link>
 <script type="text/javascript" src="jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="jquery.lettering.js"></script>
+<script type="text/javascript" src="jquery.textillate.js"></script>
 <style type="text/css">
 body {
 	margin: 0px;
@@ -12,6 +15,18 @@ body {
 	padding-top: 10px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+div.dialog {
+    width:400px;
+    border-radius: 7px;
+    background:#CCCCCC;
+    padding:30px;
+    z-index: 10;
+    margin-left: 200px;
+    margin-top: 200px;
+    float: none;
+    text-align: center;
 }
 
 table.locations {
@@ -33,32 +48,43 @@ span.bold {
 	font-weight: bold;
 }
 
+span.idle {
+	color: red;
+}
+
+span.collecting {
+	color: green;
+}
+
 #dimScreen {
 	position: absolute;
 	margin: 0px; 
 	padding : 0px; 
 	width : 800px; 
-	height: 80%;
+	height: 90%;
 	padding-top : 10px;
 	margin-left : auto; 
 	margin-right : auto;
 	z-index: 5;
+	background: rgba(255, 255, 255, 0.8);
 	display: none;
-	background: rgba(255, 255, 255, 0.5);
 }
 </style>
 
 
 </head>
 <body>
-	<div id="dimScreen"></div>
+	<div id="dimScreen">
+		<div id="waitDialog" class="dialog">
+			<span id="waitText" class="animated">Changing logger levels ...</span>
+		</div>
+	</div>
 	<div>
-		Connected to: <span class="bold">${host}</span> Account: <span
-			class="bold">${account}</span> Application: <span class="bold">${application}</span>
-		<span class="bold">User: ${user}</span>
+		Connected to: <span class="bold">${host}</span> Account: <span class="bold">${account}</span> Application: <span class="bold">${application}</span> User: <span class="bold">${user}</span>
 	</div>
 	<hr />
 	<div>
+		<div>Status: <span id="status" class="${statusclass}">${statustext}</span></div>
 		Incident Type: <select name="incident" id="incident">
 			${incidents}
 		</select>
@@ -66,11 +92,20 @@ span.bold {
 		<textarea rows="20" cols="70" id="traceLocations">${locations}</textarea>
 
 	</div>
-
 	<script type="text/javascript">
+	    var sessionId = null;
+	    
+		$(function () {
+		    $('.animated').textillate({
+		    	initialDelay: 0,
+		    	in: {effect: 'rollIn'},
+		    	out: {effect: 'rollOut'},
+		    	loop: true
+		    });
+		})
 		var traceConfigs = {};
 		//${jsLocations}
-		$("#incident").change(function(e) {
+		$('#incident').change(function(e) {
 			var traceConfig = traceConfigs[e.target.value];
 			var areaContent = '';
 			for (var i = 0; i < traceConfig.length; i++) {
@@ -80,23 +115,55 @@ span.bold {
 				}
 			}
 
-			$("#traceLocations").val(areaContent);
+			$('#traceLocations').val(areaContent);
 		});
 
-		$("#startTraces").click(function() {
-			$("#dimScreen").show();
-/* 			var data = $('#traceLocations').val();
-			$.ajax({
-				type : 'POST',
-				url : '/doTraces',
-				data : data,
-				success : function(data, status, jqxhr) {
-					alert('started collection of traces');
-					$("#dimScreen").hide();
-				},
-				dataType : 'text'
-			});
- */		});
+		$('#startTraces').click(function() {
+			$('#dimScreen').show();
+			$('#waitDialog').show();
+			var locations = $('#traceLocations').val();
+			if (sessionId == null ) {
+				$.ajax({
+					type : 'POST',
+					url : '/startTraces',
+					data : locations,
+					success : function(data, status, jqxhr) {
+						$('#dimScreen').hide();
+						$('#waitDialog').hide();
+						$('#startTraces').html('Stop Collecting Traces');
+						$('#status').html('Collecting Traces');
+						$('#status').removeClass('idle')
+						$('#status').addClass('collecting');
+						$('#traceLocations').prop('disabled', true);
+						$('#incident').prop('disabled', true);
+						sessionId = data;
+					},
+					error : function(jqxhr, status, errror) {
+						$('#dimScreen').hide();
+						$('#waitDialog').hide();
+						alert("Failed to start the trace collector");
+					},
+					dataType : 'text'
+				});
+			} else {
+				$.ajax({
+					type : 'POST',
+					url : '/stopTraces',
+					data : locations,
+					success : function(data, status, jqxhr) {
+						$('#dimScreen').hide();
+						$('#waitDialog').hide();
+						$('#startTraces').html('Start Collecting Traces');
+						$('#status').html('Not Collecting Traces');
+						$('#status').removeClass('collecting')
+						$('#status').addClass('idle');
+						$('#traceLocations').prop('disabled', false);
+						$('#incident').prop('disabled', false);
+						sessionId = null;
+					}
+				});
+			}
+ 		});
 	</script>
 </body>
 </html>

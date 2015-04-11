@@ -190,7 +190,9 @@ public class LoginHttpHandlerTest extends AbstractHandlerTest {
       mockListLogs.executeConsoleTool();
       EasyMock.expectLastCall();
       EasyMock.expect(mockListLogs.getConsoleOutput()).andReturn("");
-      EasyMock.expect(mockListLogs.parseListLogsOutput()).andReturn(new HashMap<String, LogFileDescriptor>());
+//      EasyMock.expect(mockListLogs.parseListLogsOutput()).andReturn(new HashMap<String, LogFileDescriptor>());
+      mockListLogs.printConsoleToSystemOut();
+      EasyMock.expectLastCall();
       
       FileOutputStream mockFos = EasyMock.createMock(FileOutputStream.class);
       PowerMock.expectNew(FileOutputStream.class, "host1_account1_application1.session").andReturn(mockFos);

@@ -42,8 +42,8 @@ public class MainHttpHandlerTest extends AbstractHandlerTest {
     holder.mockOutput.flush();
     String response = new String(holder.mockOutput.toByteArray(), "UTF-8");
 
-    Assert.assertTrue(response, response.contains("<div>Connected to: <span class=\"bold\">host1</span> Account: <span class=\"bold\">account1</span>")); 
-    Assert.assertTrue(response, response.contains("Application: <span class=\"bold\">application1</span> <span class=\"bold\">User: user1</span></div>"));
+    Assert.assertTrue(response, response.contains("Connected to: <span class=\"bold\">host1</span> Account: <span class=\"bold\">account1</span>"));
+    Assert.assertTrue(response, response.contains("Application: <span class=\"bold\">application1</span> User: <span class=\"bold\">user1</span>"));
     
     Assert.assertTrue(response, response.contains("<option value=\"testConfig0\">testConfig0</option>"));
     Assert.assertTrue(response, response.contains("<option value=\"testConfig1\">testConfig1</option>"));
@@ -74,6 +74,7 @@ public class MainHttpHandlerTest extends AbstractHandlerTest {
     EasyMock.expect(mockSession.getAccount()).andReturn("account1");
     EasyMock.expect(mockSession.getApplication()).andReturn("application1");
     EasyMock.expect(mockSession.getUser()).andReturn("user1");
+    EasyMock.expect(mockSession.getCurrentTracesCollectionInfo()).andReturn(null);
 
     File mockCurrentFolder = EasyMock.createMock(File.class);
     PowerMock.expectNew(File.class, ".").andReturn(mockCurrentFolder);

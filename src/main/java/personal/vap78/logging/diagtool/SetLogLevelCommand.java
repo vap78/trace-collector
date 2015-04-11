@@ -33,6 +33,12 @@ public class SetLogLevelCommand extends AbstractLogCommand {
   protected String getCommandName() {
     return SET_LOG_LEVEL_COMMAND;
   }
+    
+  
+  @Override
+  public boolean isExecutionSuccessful() {
+    return consoleOutput != null && consoleOutput.indexOf("[set-log-level] operation is successful.") != -1;
+  }
   
   private String locationsToString() {
     StringBuilder builder = new StringBuilder();
@@ -44,4 +50,5 @@ public class SetLogLevelCommand extends AbstractLogCommand {
     }
     return builder.toString();
   }
+  
 }

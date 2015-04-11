@@ -10,7 +10,8 @@ import org.glassfish.grizzly.http.server.HttpServer;
 
 import personal.vap78.logging.diagtool.handlers.LoginHttpHandler;
 import personal.vap78.logging.diagtool.handlers.MainHttpHandler;
-import personal.vap78.logging.diagtool.handlers.TracesCollectionHttpHandler;
+import personal.vap78.logging.diagtool.handlers.StartTracesCollectionHttpHandler;
+import personal.vap78.logging.diagtool.handlers.StopTracesCollectionHttpHandler;
 
 public class LocalServer {
   
@@ -21,7 +22,8 @@ public class LocalServer {
     server.getServerConfiguration().addHttpHandler(new LoginHttpHandler(), "/doLogin");
     server.getServerConfiguration().addHttpHandler(new MainHttpHandler(), "/main");
     server.getServerConfiguration().addHttpHandler(new MainHttpHandler(), "/main");
-    server.getServerConfiguration().addHttpHandler(new TracesCollectionHttpHandler(),"/doTraces");
+    server.getServerConfiguration().addHttpHandler(new StartTracesCollectionHttpHandler(),"/startTraces");
+    server.getServerConfiguration().addHttpHandler(new StopTracesCollectionHttpHandler(),"/stopTraces");
   }
   
   public static UUID createUUID() {

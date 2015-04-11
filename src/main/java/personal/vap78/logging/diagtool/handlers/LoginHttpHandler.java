@@ -58,10 +58,7 @@ public class LoginHttpHandler extends AbstractHttpHandler {
     ListLogFilesCommand command = new ListLogFilesCommand(session);
     try {
       command.executeConsoleTool();
-      Map<String, LogFileDescriptor> logFiles = command.parseListLogsOutput();
-
-      session.setLogs(logFiles);
-
+      command.printConsoleToSystemOut();
       storeProperties(session);
 
       Cookie sessionCookie = new Cookie(SESSION_ID, uuid.toString());

@@ -15,38 +15,45 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.apache.commons.io.IOUtils;
+
 public class HtmlReportGenerator {
 
+  public static final String REPORTS_FOLDER = "reports";
   private static final SimpleDateFormat SDF = new SimpleDateFormat("YYYY MM dd HH:mm:ss");
   private static final SimpleDateFormat SDF_WITH_TIME_ZONE = new SimpleDateFormat("YYYY MM dd HH:mm:ss z");
   private Map<String, LogFileDescriptor> logFiles;
   private long endTime;
   private long startTime;
-  private Properties properties;
   private boolean isTrialAccount;
+  private Session session;
 
   // private HeaderDescriptor headerDescriptor;
 
-  public HtmlReportGenerator(Properties props, Map<String, LogFileDescriptor> logFiles, long startTime, long endTime) {
-    this.properties = props;
+  public HtmlReportGenerator(Session session, Map<String, LogFileDescriptor> logFiles, long startTime, long endTime) {
+    this.session = session;
     this.logFiles = logFiles;
     this.startTime = startTime;
     this.endTime = endTime;
-    isTrialAccount = props.getProperty(AbstractLogCommand.HOST_PARAM).contains("hanatrial");
+    isTrialAccount = session.getHost().contains("hanatrial");
   }
 
-  public void generateHtmlReport() throws IOException, ParseException {
-    String ljsLogPath = GetLogsCommand.LOGS_DOWNLOAD_DIRECTORY + File.separator + logFiles.get(AbstractLogCommand.LJS_TRACE).name;
+  public File generateHtmlReport() throws IOException, ParseException {
+    String ljsLogPath = GetLogsCommand.LOGS_DOWNLOAD_DIRECTORY + File.separator + logFiles.get(AbstractLogCommand.LJS_TRACE).getName();
     // String httpTracePath = Main.LOGS_DOWNLOAD_DIRECTORY + File.separator +
     // logFiles.get(Main.HTTP_TRACE);
-    String ljsReport = logFiles.get(AbstractLogCommand.LJS_TRACE).name + ".html";
+    String ljsReport = logFiles.get(AbstractLogCommand.LJS_TRACE).getName() + ".html";
     PrintStream ljsOutput = null;
 
     BufferedReader templateReader = null;
-
+    File reportsRootDir = new File(REPORTS_FOLDER);
+    if (!reportsRootDir.exists()) {
+      reportsRootDir.mkdir();
+    }
     BufferedReader ljsLogReader = null;
     try {
-      ljsOutput = new PrintStream(new File(ljsReport));
+      File reportFile = new File(reportsRootDir, ljsReport);
+      ljsOutput = new PrintStream(reportFile);
       templateReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("template.html")));
 
       ljsLogReader = new BufferedReader(new FileReader(ljsLogPath));
@@ -65,18 +72,12 @@ public class HtmlReportGenerator {
       }
 
       writeFooter(ljsOutput, templateReader);
+      return reportFile;
     } finally {
-      if (templateReader != null) {
-        templateReader.close();
-      }
-      if (ljsLogReader != null) {
-        ljsLogReader.close();
-      }
-      if (ljsOutput != null) {
-        ljsOutput.close();
-      }
+      IOUtils.closeQuietly(templateReader);
+      IOUtils.closeQuietly(ljsLogReader);
+      IOUtils.closeQuietly(ljsOutput);
     }
-
   }
 
   private void writeTableHeader(PrintStream ljsOutput, LjsLogEntry firstEntry) {
@@ -147,10 +148,10 @@ public class HtmlReportGenerator {
       String line = templateReader.readLine();
       if ("${header}".equals(line)) {
         ljsOutput.println("Collected ljs traces for:<br/>");
-        ljsOutput.println("Host: <b>" + properties.getProperty(AbstractLogCommand.HOST_PARAM) + "</b><br/>");
-        ljsOutput.println("Account: <b>" + properties.getProperty(AbstractLogCommand.ACCOUNT_PARAM) + "</b><br/>");
-        ljsOutput.println("Application: <b>" + properties.getProperty(AbstractLogCommand.APPLICATION_PARAM) + "</b><br/>");
-        ljsOutput.println("File: <b>" + logFiles.get(AbstractLogCommand.LJS_TRACE).name + "</b><br/>");
+        ljsOutput.println("Host: <b>" + session.getHost() + "</b><br/>");
+        ljsOutput.println("Account: <b>" + session.getAccount() + "</b><br/>");
+        ljsOutput.println("Application: <b>" + session.getApplication() + "</b><br/>");
+        ljsOutput.println("File: <b>" + logFiles.get(AbstractLogCommand.LJS_TRACE).getName() + "</b><br/>");
         ljsOutput.println("Start time: <b>" + SDF_WITH_TIME_ZONE.format(startTime) + "</b><br/>");
         ljsOutput.println("End time: <b>" + SDF_WITH_TIME_ZONE.format(endTime) + "</b><br/>");
         ljsOutput.println("<hr>");
@@ -278,12 +279,12 @@ public class HtmlReportGenerator {
     Map<String, LogFileDescriptor> map = new HashMap<String, LogFileDescriptor>();
 
     LogFileDescriptor lfd = new LogFileDescriptor();
-    lfd.name = "ljs_trace_ffe4b7d_2015-02-08.log";
-    lfd.type = "ljs";
+    lfd.setName("ljs_trace_ffe4b7d_2015-02-08.log");
+    lfd.setType("ljs");
 
     map.put(AbstractLogCommand.LJS_TRACE, lfd);
-
-    HtmlReportGenerator gen = new HtmlReportGenerator(props, map, 0, 0);
+    Session session = new Session("testid", props);
+    HtmlReportGenerator gen = new HtmlReportGenerator(session, map, 0, 0);
 
     gen.generateHtmlReport();
   }
