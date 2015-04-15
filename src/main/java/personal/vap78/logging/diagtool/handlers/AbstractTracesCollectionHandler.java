@@ -15,7 +15,8 @@ public abstract class AbstractTracesCollectionHandler extends AbstractHttpHandle
   
   protected void setLogLevels(Session session, Request req, LogLevel level) throws Exception {
     
-    List<String> locations = readLocationsToList(req);
+    List<String> locationsFromRequest = readLocationsToList(req);
+    List<String> locations = new ArrayList<String>();
     
     SetLogLevelCommand command = new SetLogLevelCommand(session, locations, level);
     

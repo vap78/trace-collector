@@ -24,27 +24,34 @@ public class StopTracesCollectionHttpHandler extends AbstractTracesCollectionHan
       response.sendRedirect(DO_LOGIN_ALIAS);
       return;
     }
-    
-    TraceCollectionInfo info = session.getCurrentTracesCollectionInfo();
-    info.setEndTime(System.currentTimeMillis());
-
-    setLogLevels(session, request, LogLevel.ERROR);
-    
-    ListLogFilesCommand listLogFiles = new ListLogFilesCommand(session);
-    listLogFiles.executeConsoleTool();
-    Map<String, LogFileDescriptor> logFiles = listLogFiles.parseListLogsOutput();
-    
-    GetLogsCommand getLogs = new GetLogsCommand(session, logFiles.get(AbstractLogCommand.LJS_TRACE).getName());
-    getLogs.executeConsoleTool();
-    
-    if (!getLogs.isExecutionSuccessful()) {
-      response.sendError(500, "Failed to retrieve log files after the trace collector has stopped");
-      return;
+    try {
+      TraceCollectionInfo info = session.getCurrentTracesCollectionInfo();
+      info.setEndTime(System.currentTimeMillis());
+  
+      setLogLevels(session, request, LogLevel.ERROR);
+      
+      ListLogFilesCommand listLogFiles = new ListLogFilesCommand(session);
+      listLogFiles.executeConsoleTool();
+      listLogFiles.printConsoleToSystemOut();
+      Map<String, LogFileDescriptor> logFiles = listLogFiles.parseListLogsOutput();
+      
+      GetLogsCommand getLogs = new GetLogsCommand(session, logFiles.get(AbstractLogCommand.LJS_TRACE).getName());
+      getLogs.executeConsoleTool();
+      getLogs.printConsoleToSystemOut();
+      
+      if (!getLogs.isExecutionSuccessful()) {
+        response.sendError(500, "Failed to retrieve log files after the trace collector has stopped");
+        return;
+      }
+      
+      HtmlReportGenerator reportGenerator = new HtmlReportGenerator(session, logFiles, info.getStartTime(), info.getEndTime());
+      File reportFile = reportGenerator.generateHtmlReport();
+      response.getWriter().write(reportFile.getName());
+      session.addCollectedTraceFile(reportFile.getName());
+    } catch (Exception e) {
+      e.printStackTrace();
+      response.sendError(500);
     }
-    
-    HtmlReportGenerator reportGenerator = new HtmlReportGenerator(null, logFiles, info.getStartTime(), info.getEndTime());
-    File reportFile = reportGenerator.generateHtmlReport();
-    response.getWriter().write(reportFile.getName());
   }
 
 }

@@ -30,8 +30,13 @@ public class MainHttpHandler extends AbstractHttpHandler {
     String application = session.getApplication();
     String user = session.getUser();
     
-    String content = TEMPLATE.replace("${host}", host).replace("${account}", account)
-         .replace("${application}", application).replace("${user}", user);
+    StringBuilder content = new StringBuilder(TEMPLATE);
+    
+    replaceAll(content, "${host}", host);
+    replaceAll(content, "${account}", account);
+    replaceAll(content, "${user}", user);
+    replaceAll(content, "${application}", application);
+
     TraceConfiguration.addFromDirectory(new File("."));
     ArrayList<String> traceConfigurations = new ArrayList<>(TraceConfiguration.getAllConfigurationNames());
     if (traceConfigurations.size() > 0) {
@@ -55,22 +60,49 @@ public class MainHttpHandler extends AbstractHttpHandler {
           }
         }
       }
-      content = content.replace("${incidents}", optionsBuilder.toString());
-      content = content.replace("//${jsLocations}", jsArrayBuilder.toString());
-      content = content.replace("${locations}",  TraceConfiguration.getByName(traceConfigurations.get(0)).getLocationsAsString());
+      
+      replaceAll(content, "${incidents}", optionsBuilder.toString());
+      replaceAll(content, "//${jsLocations}", jsArrayBuilder.toString());
+      replaceAll(content, "${locations}",  TraceConfiguration.getByName(traceConfigurations.get(0)).getLocationsAsString());
     } else {
-      content = content.replace("${incidents}", "");
+      replaceAll(content, "${incidents}", "");
     }
     
     if (session.getCurrentTracesCollectionInfo() != null) {
-      content = content.replace("${statusclass}", "collecting");
-      content = content.replace("${statustext}", "Collecting Traces");
+      replaceAll(content, "${statusclass}", "collecting");
+      replaceAll(content, "${statustext}", "Collecting Traces");
     } else {
-      content = content.replace("${statusclass}", "idle");
-      content = content.replace("${statustext}", "Not Collecting Traces");
+      replaceAll(content, "${statusclass}", "idle");
+      replaceAll(content, "${statustext}", "Not Collecting Traces");
     }
     
-    resp.getWriter().write(content);
+    List<String> collectedTraces = session.getCollectedTraceFiles(); 
+    if (collectedTraces.size() == 0) {
+      replaceAll(content, "${sessionResultsDisplay}", "display: none");
+      replaceAll(content, "${sessionResults}", "");
+    } else {
+      replaceAll(content, "${sessionResultsDisplay}", "display: block");
+      StringBuilder tracesHtml = new StringBuilder();
+      for (String traceFileName : collectedTraces) {
+        tracesHtml.append("<a target=\"_blank\" href=\"/getLog?name=");
+        tracesHtml.append(traceFileName);
+        tracesHtml.append("\">");
+        tracesHtml.append(traceFileName);
+        tracesHtml.append("</a><br/>");
+      }
+      replaceAll(content, "${sessionResults}", tracesHtml.toString());
+    }
+    
+    resp.getWriter().write(content.toString());
     resp.getWriter().flush();
+  }
+  
+  public static void replaceAll(StringBuilder builder, String from, String to) {
+    int index = builder.indexOf(from);
+    while (index != -1) {
+      builder.replace(index, index + from.length(), to);
+      index += to.length(); // Move to the end of the replacement
+      index = builder.indexOf(from, index);
+    }
   }
 }

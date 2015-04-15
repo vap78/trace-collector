@@ -92,6 +92,12 @@ span.collecting {
 		<textarea rows="20" cols="70" id="traceLocations">${locations}</textarea>
 
 	</div>
+	<div id="sessionResults" style="${sessionResultsDisplay}">
+	  <br/>
+	  <hr/>
+	  Collected traces for this session:
+	  ${sessionResults}
+	</div>
 	<script type="text/javascript">
 	    var sessionId = null;
 	    
@@ -160,10 +166,23 @@ span.collecting {
 						$('#traceLocations').prop('disabled', false);
 						$('#incident').prop('disabled', false);
 						sessionId = null;
+						appendLogFile(data);
+					},
+					error : function() {
+						alert("failed to retrieve the traces");
 					}
 				});
 			}
  		});
+		
+		function appendLogFile(name) {
+			if ($('#sessionResults').css('display') == 'none') {
+				$('#sessionResults').css('display', 'block');
+			}
+			var currentContent = $('#sessionResults').html();
+			currentContent += '<a target="_blank" href="/getLog?name=' + name + '">' + name + '</a><br/>\n';
+			$('#sessionResults').html(currentContent);
+		}
 	</script>
 </body>
 </html>

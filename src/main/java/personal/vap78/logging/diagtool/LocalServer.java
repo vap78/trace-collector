@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 
+import personal.vap78.logging.diagtool.handlers.DownloadLogsHandler;
 import personal.vap78.logging.diagtool.handlers.LoginHttpHandler;
 import personal.vap78.logging.diagtool.handlers.MainHttpHandler;
 import personal.vap78.logging.diagtool.handlers.StartTracesCollectionHttpHandler;
@@ -21,9 +22,9 @@ public class LocalServer {
     server = HttpServer.createSimpleServer("resources", 4242);
     server.getServerConfiguration().addHttpHandler(new LoginHttpHandler(), "/doLogin");
     server.getServerConfiguration().addHttpHandler(new MainHttpHandler(), "/main");
-    server.getServerConfiguration().addHttpHandler(new MainHttpHandler(), "/main");
     server.getServerConfiguration().addHttpHandler(new StartTracesCollectionHttpHandler(),"/startTraces");
     server.getServerConfiguration().addHttpHandler(new StopTracesCollectionHttpHandler(),"/stopTraces");
+    server.getServerConfiguration().addHttpHandler(new DownloadLogsHandler(),"/getLog");
   }
   
   public static UUID createUUID() {
@@ -48,7 +49,7 @@ public class LocalServer {
     } catch (IOException e) {
       e.printStackTrace();
       System.out.println("Failed to start server");
-      System.exit(5);
+      System.exit(1);
     }
   }
 }

@@ -11,6 +11,7 @@ public class Main {
   private static Properties props;
 
   public static void main(String[] args) throws Exception {
+    System.out.println(new File(".").getAbsolutePath());
     String propsFilePath;
     if (args != null) {
       for (int i = 0; i < args.length; i += 2) {

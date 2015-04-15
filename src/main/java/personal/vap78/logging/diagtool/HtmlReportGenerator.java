@@ -40,8 +40,6 @@ public class HtmlReportGenerator {
 
   public File generateHtmlReport() throws IOException, ParseException {
     String ljsLogPath = GetLogsCommand.LOGS_DOWNLOAD_DIRECTORY + File.separator + logFiles.get(AbstractLogCommand.LJS_TRACE).getName();
-    // String httpTracePath = Main.LOGS_DOWNLOAD_DIRECTORY + File.separator +
-    // logFiles.get(Main.HTTP_TRACE);
     String ljsReport = logFiles.get(AbstractLogCommand.LJS_TRACE).getName() + ".html";
     PrintStream ljsOutput = null;
 
@@ -54,7 +52,7 @@ public class HtmlReportGenerator {
     try {
       File reportFile = new File(reportsRootDir, ljsReport);
       ljsOutput = new PrintStream(reportFile);
-      templateReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("template.html")));
+      templateReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("reportTemplate.html")));
 
       ljsLogReader = new BufferedReader(new FileReader(ljsLogPath));
       parseHeader(ljsLogReader);

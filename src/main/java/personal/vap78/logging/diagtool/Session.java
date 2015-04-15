@@ -1,6 +1,8 @@
 package personal.vap78.logging.diagtool;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,11 +32,13 @@ public class Session {
   private Properties properties;
   private Map<String, LogFileDescriptor> logs;
   private TraceCollectionInfo currentTraceCollectionInfo;
-   
+  private List<String> collectedTraceFiles; 
+  
   public Session(String id, Properties properties) {
     this.properties = properties;
     this.creationTime = System.currentTimeMillis();
     this.id = id;
+    this.collectedTraceFiles = new ArrayList<String>();
   }
 
   public Properties getProperties() {
@@ -105,4 +109,13 @@ public class Session {
   public void setCurrentTracesId(TraceCollectionInfo info) {
     this.currentTraceCollectionInfo = info;
   }
+  
+  public List<String> getCollectedTraceFiles() {
+    return collectedTraceFiles;
+  }
+  
+  public void addCollectedTraceFile(String name) {
+    collectedTraceFiles.add(name);
+  }
+
 }

@@ -65,7 +65,7 @@ public abstract class AbstractLogCommand {
     addCommandSpecificParameters();
     
     ProcessBuilder pb = new ProcessBuilder();
-    pb.directory(new File(executableRoot));
+    pb.directory(new File("."));
     command.add(0, getCommandName());
     command.add(0, executablePath);
 
@@ -84,6 +84,12 @@ public abstract class AbstractLogCommand {
     consoleOutput = new StringBuilder();
     while ((line = input.readLine()) != null) {
       consoleOutput.append(line).append("\n");
+    }
+    try {
+      p.waitFor();
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
   }
 

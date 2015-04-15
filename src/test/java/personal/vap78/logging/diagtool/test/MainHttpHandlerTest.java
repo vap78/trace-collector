@@ -75,7 +75,8 @@ public class MainHttpHandlerTest extends AbstractHandlerTest {
     EasyMock.expect(mockSession.getApplication()).andReturn("application1");
     EasyMock.expect(mockSession.getUser()).andReturn("user1");
     EasyMock.expect(mockSession.getCurrentTracesCollectionInfo()).andReturn(null);
-
+    EasyMock.expect(mockSession.getCollectedTraceFiles()).andReturn(new ArrayList<String>());
+    
     File mockCurrentFolder = EasyMock.createMock(File.class);
     PowerMock.expectNew(File.class, ".").andReturn(mockCurrentFolder);
     
