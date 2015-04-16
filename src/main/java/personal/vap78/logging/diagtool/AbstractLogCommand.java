@@ -32,7 +32,7 @@ public abstract class AbstractLogCommand {
   protected Session session;
   protected List<String> command;
   private String executableRoot;
-  private String executablePath;
+  protected String executablePath;
   
   public AbstractLogCommand(Session session) {
     this.session = session;
@@ -84,12 +84,6 @@ public abstract class AbstractLogCommand {
     consoleOutput = new StringBuilder();
     while ((line = input.readLine()) != null) {
       consoleOutput.append(line).append("\n");
-    }
-    try {
-      p.waitFor();
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
   }
 

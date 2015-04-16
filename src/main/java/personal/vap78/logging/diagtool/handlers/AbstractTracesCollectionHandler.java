@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.glassfish.grizzly.http.server.Request;
 
+import personal.vap78.logging.diagtool.ListLoggersCommand;
 import personal.vap78.logging.diagtool.LogLevel;
 import personal.vap78.logging.diagtool.Session;
 import personal.vap78.logging.diagtool.SetLogLevelCommand;
@@ -17,6 +18,13 @@ public abstract class AbstractTracesCollectionHandler extends AbstractHttpHandle
     
     List<String> locationsFromRequest = readLocationsToList(req);
     List<String> locations = new ArrayList<String>();
+    ListLoggersCommand listLoggersCommand = new ListLoggersCommand(session);
+    listLoggersCommand.executeConsoleTool();
+    
+    for (String location : locationsFromRequest) {
+      List<String> matchingLoggers = listLoggersCommand.getMatchingLoggers(location);
+      locations.addAll(matchingLoggers);
+    }
     
     SetLogLevelCommand command = new SetLogLevelCommand(session, locations, level);
     
