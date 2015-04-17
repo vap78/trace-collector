@@ -20,8 +20,8 @@ import org.apache.commons.io.IOUtils;
 public class HtmlReportGenerator {
 
   public static final String REPORTS_FOLDER = "reports";
-  private static final SimpleDateFormat SDF = new SimpleDateFormat("YYYY MM dd HH:mm:ss");
-  private static final SimpleDateFormat SDF_WITH_TIME_ZONE = new SimpleDateFormat("YYYY MM dd HH:mm:ss z");
+  private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy MM dd HH:mm:ss");
+  private static final SimpleDateFormat SDF_WITH_TIME_ZONE = new SimpleDateFormat("yyyy MM dd HH:mm:ss z");
   private Map<String, LogFileDescriptor> logFiles;
   private long endTime;
   private long startTime;
@@ -40,7 +40,8 @@ public class HtmlReportGenerator {
 
   public File generateHtmlReport() throws IOException, ParseException {
     String ljsLogPath = GetLogsCommand.LOGS_DOWNLOAD_DIRECTORY + File.separator + logFiles.get(AbstractLogCommand.LJS_TRACE).getName();
-    String ljsReport = logFiles.get(AbstractLogCommand.LJS_TRACE).getName() + ".html";
+    
+    String ljsReport = session.getAccount() + "_" + session.getApplication() + "_" + session.getCurrentTracesCollectionInfo().getId() + ".html";
     PrintStream ljsOutput = null;
 
     BufferedReader templateReader = null;
@@ -62,6 +63,9 @@ public class HtmlReportGenerator {
       LjsLogEntry entry = null;
       boolean tableHeaderWritten = false;
       while ((entry = getNextLJSLogEntry(ljsLogReader)) != null) {
+        if (entry.time < startTime || entry.time > endTime) {
+          continue;
+        }
         if (!tableHeaderWritten) {
           writeTableHeader(ljsOutput, entry);
           tableHeaderWritten = true;
@@ -271,21 +275,21 @@ public class HtmlReportGenerator {
     }
   }
 
-  public static void main(String[] args) throws Exception {
-    Properties props = new Properties();
-    props.load(new FileInputStream("/Users/vap78/develop/neo-java-web-sdk-2.16.5.1/tools/default.properties"));
-    Map<String, LogFileDescriptor> map = new HashMap<String, LogFileDescriptor>();
-
-    LogFileDescriptor lfd = new LogFileDescriptor();
-    lfd.setName("ljs_trace_ffe4b7d_2015-02-08.log");
-    lfd.setType("ljs");
-
-    map.put(AbstractLogCommand.LJS_TRACE, lfd);
-    Session session = new Session("testid", props);
-    HtmlReportGenerator gen = new HtmlReportGenerator(session, map, 0, 0);
-
-    gen.generateHtmlReport();
-  }
+//  public static void main(String[] args) throws Exception {
+//    Properties props = new Properties();
+//    props.load(new FileInputStream("/Users/vap78/develop/neo-java-web-sdk-2.16.5.1/tools/default.properties"));
+//    Map<String, LogFileDescriptor> map = new HashMap<String, LogFileDescriptor>();
+//
+//    LogFileDescriptor lfd = new LogFileDescriptor();
+//    lfd.setName("ljs_trace_ffe4b7d_2015-02-08.log");
+//    lfd.setType("ljs");
+//
+//    map.put(AbstractLogCommand.LJS_TRACE, lfd);
+//    Session session = new Session("testid", props);
+//    HtmlReportGenerator gen = new HtmlReportGenerator(session, map, 0, 0);
+//
+//    gen.generateHtmlReport();
+//  }
 
   static class HeaderDescriptor {
     String columnSeparator;

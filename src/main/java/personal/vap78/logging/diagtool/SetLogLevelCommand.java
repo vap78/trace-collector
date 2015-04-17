@@ -4,31 +4,28 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-
-import javax.management.RuntimeErrorException;
 
 public class SetLogLevelCommand extends AbstractLogCommand {
+  private static final int MAX_LOGGERS_COUNT = 150;
   public static final String SET_LOG_LEVEL_COMMAND = "set-log-level";
-  private List<String> locations;
+  private List<String> loggersToConfigure;
   private LogLevel level;
-  private int locationsPart;
-  private boolean finishedAllLocations = false;
+  private int loggersPart;
+  private boolean finishedAllLoggers = false;
 
 
-  public SetLogLevelCommand(Session session, List<String> locations, LogLevel level) {
+  public SetLogLevelCommand(Session session, List<String> loggers, LogLevel level) {
     super(session);
-    this.locations = locations;
+    this.loggersToConfigure = loggers;
     this.level = level;
-    locationsPart = 0;
+    loggersPart = 0;
   }
 
   @Override
   protected void addCommandSpecificParameters() {
     
-    String loggers = locationsToString();
+    String loggers = loggersToString();
     System.out.println("Loggers to be changed: " + loggers);
     String levelStr = level.getName();
     System.out.println("Log level: " + levelStr);
@@ -39,10 +36,6 @@ public class SetLogLevelCommand extends AbstractLogCommand {
     command.add(levelStr);
   }
   
-  public void getNextTenLocations() {
-    
-  }
-
   @Override
   protected String getCommandName() {
     return SET_LOG_LEVEL_COMMAND;
@@ -50,6 +43,7 @@ public class SetLogLevelCommand extends AbstractLogCommand {
   
   @Override
   public void executeConsoleTool() throws IOException, CommandExecutionException {
+    System.out.println("Setting trace level for " + loggersToConfigure.size() + " loggers");
     consoleOutput = new StringBuilder();
     do {
       addCommonCommandParameters();
@@ -76,7 +70,7 @@ public class SetLogLevelCommand extends AbstractLogCommand {
       while ((line = input.readLine()) != null) {
         consoleOutput.append(line).append("\n");
       }
-    } while (finishedAllLocations == false);
+    } while (finishedAllLoggers == false);
   }
   
   @Override
@@ -84,36 +78,36 @@ public class SetLogLevelCommand extends AbstractLogCommand {
     return consoleOutput != null && consoleOutput.indexOf("[set-log-level] operation is successful.") != -1;
   }
   
-  private String locationsToString() {
-    if (finishedAllLocations) {
-      throw new RuntimeException("Already iterated all locations");
+  private String loggersToString() {
+    if (finishedAllLoggers) {
+      throw new RuntimeException("Already iterated all loggers");
     }
     StringBuilder builder = new StringBuilder();
-    for (int i = locationsPart * 50; i < locationsPart * 50 + 50; i++) {
-      if (i < locations.size()) {
-        builder.append(locations.get(i));
-        if (i < locationsPart * 50 + 49 && i < locations.size() - 1) {
+    for (int i = loggersPart * MAX_LOGGERS_COUNT; i < loggersPart * MAX_LOGGERS_COUNT + MAX_LOGGERS_COUNT; i++) {
+      if (i < loggersToConfigure.size()) {
+        builder.append(loggersToConfigure.get(i));
+        if (i < loggersPart * MAX_LOGGERS_COUNT + MAX_LOGGERS_COUNT - 1 && i < loggersToConfigure.size() - 1) {
           builder.append(",");
         }
       } else {
-        finishedAllLocations = true;
+        finishedAllLoggers = true;
         break;
       }
     }
-    locationsPart++;
+    loggersPart++;
     return builder.toString();
   }
   
-  public static void main(String[] args) {
-    List<String> locations = new ArrayList<>();
-    for (int i = 0; i < 5; i++) {
-      locations.add("location" + i);
-    }
-    SetLogLevelCommand cmd = new SetLogLevelCommand(new Session("", new Properties()), locations,LogLevel.ALL);
-    System.out.println(cmd.locationsToString());
-    System.out.println(cmd.locationsToString());
-    System.out.println(cmd.locationsToString());
-    System.out.println(cmd.locationsToString());
-  }
+//  public static void main(String[] args) {
+//    List<String> locations = new ArrayList<>();
+//    for (int i = 0; i < 5; i++) {
+//      locations.add("location" + i);
+//    }
+//    SetLogLevelCommand cmd = new SetLogLevelCommand(new Session("", new Properties()), locations,LogLevel.ALL);
+//    System.out.println(cmd.loggersToString());
+//    System.out.println(cmd.loggersToString());
+//    System.out.println(cmd.loggersToString());
+//    System.out.println(cmd.loggersToString());
+//  }
   
 }

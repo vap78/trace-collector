@@ -176,10 +176,11 @@ span.collecting {
  		});
 		
 		function appendLogFile(name) {
+			var currentContent = $('#sessionResults').html();
 			if ($('#sessionResults').css('display') == 'none') {
 				$('#sessionResults').css('display', 'block');
+				currentContent += '<br/>';
 			}
-			var currentContent = $('#sessionResults').html();
 			currentContent += '<a target="_blank" href="/getLog?name=' + name + '">' + name + '</a><br/>\n';
 			$('#sessionResults').html(currentContent);
 		}
