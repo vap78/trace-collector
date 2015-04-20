@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 
 public class HtmlReportGenerator {
 
+  private static final int MAX_LINE_LENGTH = 80;
   public static final String REPORTS_FOLDER = "reports";
   private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy MM dd HH:mm:ss");
   private static final SimpleDateFormat SDF_WITH_TIME_ZONE = new SimpleDateFormat("yyyy MM dd HH:mm:ss z");
@@ -250,9 +251,26 @@ public class HtmlReportGenerator {
       appendNext(parsedLine, entry, 12);
     }
     entry.text = htmlEncode(entry.text);
+    entry.text = addLineBreaks(entry.text);
     return entry;
   }
 
+  private static String addLineBreaks(String text) {
+    int start = 0;
+    int end = MAX_LINE_LENGTH;
+    StringBuilder builder = new StringBuilder();
+    while (start < text.length()) {
+      if (end >= text.length()) {
+        end = text.length();
+      }
+      builder.append(text.substring(start, end));
+      builder.append("\n");
+      start += MAX_LINE_LENGTH;
+      end += MAX_LINE_LENGTH;
+    }
+    return builder.toString();
+  }
+  
   private String htmlEncode(String text) {
     StringBuilder out = new StringBuilder();
     for (int i = 0; i < text.length(); i++) {
