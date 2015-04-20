@@ -251,7 +251,16 @@ public class HtmlReportGenerator {
       appendNext(parsedLine, entry, 12);
     }
     entry.text = htmlEncode(entry.text);
-    entry.text = addLineBreaks(entry.text);
+    String[] entryLines = entry.text.split("\n");
+    for (int i = 0; i < entryLines.length; i++) {
+      entryLines[i] = addLineBreaks(entryLines[i]);
+    }
+    StringBuilder builder = new StringBuilder();
+    for (String entryLine : entryLines) {
+      builder.append(line);
+      builder.append("\n");
+    }
+    entry.text = addLineBreaks(builder.toString());
     return entry;
   }
 
