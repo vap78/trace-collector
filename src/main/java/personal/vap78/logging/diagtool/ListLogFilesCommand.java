@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 public class ListLogFilesCommand extends AbstractLogCommand {
 
@@ -79,15 +78,10 @@ public class ListLogFilesCommand extends AbstractLogCommand {
   }
 
   private long getFileTime(String[] parts) throws Exception {
-    String dateStr = "";
-    for (int i = 0; i < parts.length - 1; i++) {
-      dateStr += parts[i] + " ";
-    }
+    String dateStr = parts[0] + " " + parts[1];
 
     Date date = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault()).parse(dateStr);
-
+    
     return date.getTime();
   }
-
-
 }

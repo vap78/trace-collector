@@ -2,7 +2,6 @@ package personal.vap78.logging.diagtool;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,9 +9,7 @@ import java.io.PrintStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
@@ -257,7 +254,7 @@ public class HtmlReportGenerator {
     }
     StringBuilder builder = new StringBuilder();
     for (String entryLine : entryLines) {
-      builder.append(line);
+      builder.append(entryLine);
       builder.append("\n");
     }
     entry.text = addLineBreaks(builder.toString());

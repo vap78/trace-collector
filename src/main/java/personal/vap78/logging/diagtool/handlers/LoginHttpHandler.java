@@ -1,6 +1,5 @@
 package personal.vap78.logging.diagtool.handlers;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,7 +22,6 @@ import personal.vap78.logging.diagtool.AbstractLogCommand;
 import personal.vap78.logging.diagtool.CommandExecutionException;
 import personal.vap78.logging.diagtool.ListLogFilesCommand;
 import personal.vap78.logging.diagtool.LocalServer;
-import personal.vap78.logging.diagtool.LogFileDescriptor;
 import personal.vap78.logging.diagtool.Session;
 
 public class LoginHttpHandler extends AbstractHttpHandler {
@@ -129,7 +127,7 @@ public class LoginHttpHandler extends AbstractHttpHandler {
     if (lastSession == null) {
       content = content.replace("${host}", "").replace("${account}", "")
           .replace("${application}", "").replace("${user}", "").replace("${proxy}", "")
-          .replace("${proxyUser}", "");
+          .replace("${proxyUser}", "").replace("${sdkPath}", "");
     } else {
       content = content.replace("${host}", lastSession.getHost())
           .replace("${account}", lastSession.getAccount())

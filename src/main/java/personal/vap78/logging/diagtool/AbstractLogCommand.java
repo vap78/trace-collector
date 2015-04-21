@@ -4,10 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
@@ -72,6 +71,11 @@ public abstract class AbstractLogCommand {
     printCommandParameters();
 
     pb.command(command);
+
+    if (session.getProxy() != null) {
+      Map<String, String> environmentMap = pb.environment();
+      setProxy(environmentMap);
+    }
     pb.redirectErrorStream(true);
     Process p = pb.start();
 
@@ -87,7 +91,60 @@ public abstract class AbstractLogCommand {
     }
   }
 
-  protected abstract String getCommandName();
+  protected void setProxy(Map<String, String> environmentMap) {
+    String proxy = session.getProxy();
+    if (proxy == null || "".equals(proxy)) {
+      System.out.println("No proxy configured for this run");
+      return;
+    }
+    
+    if (OSDetector.isWindows()) {
+// set HTTP_PROXY_HOST=proxy
+// set HTTP_PROXY_PORT=8080
+// set HTTPS_PROXY_HOST=proxy
+// set HTTPS_PROXY_PORT=8080
+// set HTTP_NON_PROXY_HOSTS="localhost"
+//
+// If you need basic proxy authentication, enter your user name and password:
+//
+// set HTTP_PROXY_USER=<user name>
+// set HTTP_PROXY_PASSWORD=<password>
+// set HTTPS_PROXY_USER=<user name>
+// set HTTPS_PROXY_PASSWORD=<password>
+      String[] hostAndPort = proxy.split(":");
+      
+      environmentMap.put("HTTP_PROXY_HOST", hostAndPort[0]);
+      environmentMap.put("HTTPS_PROXY_HOST", hostAndPort[0]);
+      environmentMap.put("HTTP_PROXY_PORT", hostAndPort[1]);
+      environmentMap.put("HTTPS_PROXY_PORT", hostAndPort[1]);
+      environmentMap.put("HTTP_NON_PROXY_HOSTS", "localhost");
+      if (session.getProxyUser() != null && !"".equals(session.getProxyUser())) {
+        environmentMap.put("HTTP_PROXY_USER", session.getProxyUser());
+        environmentMap.put("HTTP_PROXY_PASSWORD", session.getProxyPassword());
+        environmentMap.put("HTTPS_PROXY_USER", session.getProxyUser());
+        environmentMap.put("HTTPS_PROXY_PASSWORD", session.getProxyPassword());
+      }
+    } else {
+//      export http_proxy=http://proxy:8080
+//      export https_proxy=https://proxy:8080
+//      export no_proxy="localhost"
+//
+//      If you need basic proxy authentication, add your user name and password:
+//
+//      export http_proxy=http://<user name>:<password>@proxy:8080
+//      export https_proxy=https://<user name>:<password>@proxy:8080
+      if (session.getProxyUser() != null && !"".equals(session.getProxyUser())) {
+        environmentMap.put("http_proxy", "http://" + session.getProxyUser() + ":" + session.getProxyPassword() + "@" + session.getProxy());
+        environmentMap.put("https_proxy", "https://" + session.getProxyUser() + ":" + session.getProxyPassword() + "@" + session.getProxy());
+      } else {
+        environmentMap.put("http_proxy", "http://" + session.getProxy());
+        environmentMap.put("https_proxy", "https://" + session.getProxy());
+      }
+      environmentMap.put("no_proxy", "localhost");
+    }
+}
+
+protected abstract String getCommandName();
 
   protected abstract void addCommandSpecificParameters();
 

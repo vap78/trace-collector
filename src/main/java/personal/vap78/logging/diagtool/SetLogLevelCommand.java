@@ -5,9 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 
 public class SetLogLevelCommand extends AbstractLogCommand {
-  private static final int MAX_LOGGERS_COUNT = 150;
+  private static final int MAX_LOGGERS_COUNT = 50;
   public static final String SET_LOG_LEVEL_COMMAND = "set-log-level";
   private List<String> loggersToConfigure;
   private LogLevel level;
@@ -51,6 +52,12 @@ public class SetLogLevelCommand extends AbstractLogCommand {
       addCommandSpecificParameters();
       
       ProcessBuilder pb = new ProcessBuilder();
+
+      if (session.getProxy() != null) {
+        Map<String, String> environmentMap = pb.environment();
+        setProxy(environmentMap);
+      }
+
       pb.directory(new File("."));
       command.add(0, getCommandName());
       command.add(0, executablePath);

@@ -25,6 +25,9 @@ public class ListLoggersCommand extends AbstractLogCommand {
   @Override
   public void executeConsoleTool() throws IOException, CommandExecutionException {
     super.executeConsoleTool();
+    if (!isExecutionSuccessful()) {
+      throw new CommandExecutionException(this, "Failed to list the loggers");
+    }
     parseLoggerList();
   }
   

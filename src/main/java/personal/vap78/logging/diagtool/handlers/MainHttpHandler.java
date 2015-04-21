@@ -66,6 +66,7 @@ public class MainHttpHandler extends AbstractHttpHandler {
       replaceAll(content, "${locations}",  TraceConfiguration.getByName(traceConfigurations.get(0)).getLocationsAsString());
     } else {
       replaceAll(content, "${incidents}", "");
+      replaceAll(content, "${locations}", "");
     }
     
     if (session.getCurrentTracesCollectionInfo() != null) {

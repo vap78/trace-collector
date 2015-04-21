@@ -77,7 +77,7 @@ input {
 </head>
 <body style="width: 800px; margin-left: auto; margin-right:auto">
 	${errorMessage}
-	<p>Select previous session: <select name="sessions">
+	<p>Select previous session: <select name="sessions" style="width: 600px">
 	<option value="empty"></option> ${sessions}</select></p>
 	<form method="POST" action="doLogin" name="loginForm" onsubmit="return verifyForm()">
 		<table id="connectionDetails" style="width: 100%">
@@ -87,9 +87,9 @@ input {
 			<tr><td class="left">Application:</td><td class="right"><input type="text" name="application" value="${application}"/></td></tr>
 			<tr><td class="left">User:</td><td class="right"><input type="text" name="user" value="${user}"/></td></tr>
 			<tr><td class="left">Password:</td><td class="right"><input type="password" name="password"/></td></tr>
-			<tr><td class="left">Proxy (host:port)</td><td class="right"><input type="text" name="proxy" value="${proxy}"/></td></tr>
-			<tr><td class="left">Proxy user</td><td class="right"><input type="text" name="proxyUser" value="${proxyUser}"/></td></tr>
-			<tr><td class="left">Proxy password</td><td class="right"><input type="text" name="proxyPassword""/></td></tr>
+			<tr><td class="left">Proxy (host:port):</td><td class="right"><input type="text" name="proxy" value="${proxy}"/></td></tr>
+			<tr><td class="left">Proxy user:</td><td class="right"><input type="text" name="proxyUser" value="${proxyUser}"/></td></tr>
+			<tr><td class="left">Proxy password:</td><td class="right"><input type="text" name="proxyPassword""/></td></tr>
 		</table>
 		<br/>
 		<center><button name="submit" style="width: 200px; height: 40px">Login</button></center>
