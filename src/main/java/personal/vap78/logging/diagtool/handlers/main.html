@@ -149,6 +149,9 @@ span.collecting {
 						sessionId = data;
 					},
 					error : function(jqxhr, status, errror) {
+					    if (jqxhr.status == 401) {
+					      window.location.replace('/doLogin');
+					    }
 						$('#dimScreen').hide();
 						$('#waitDialog').hide();
 						alert("Failed to start the trace collector");
@@ -173,6 +176,11 @@ span.collecting {
 						appendLogFile(data);
 					},
 					error : function() {
+					    if (jqxhr.status == 401) {
+					      window.location.replace('/doLogin');
+					    }
+						$('#dimScreen').hide();
+						$('#waitDialog').hide();
 						alert("failed to retrieve the traces");
 					}
 				});

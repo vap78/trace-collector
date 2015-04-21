@@ -12,16 +12,16 @@ import personal.vap78.logging.diagtool.Session;
 public class StartTracesCollectionHttpHandler extends AbstractTracesCollectionHandler {
 
   @Override
-  public void service(Request req, Response resp) throws Exception {
-    super.service(req, resp);
+  public void service(Request request, Response response) throws Exception {
+    super.service(request, response);
     
-    Session session = getSession(req, resp);
+    Session session = getSession(request, response);
     if (session == null) {
-      resp.sendRedirect(DO_LOGIN_ALIAS);
+      response.sendError(401);
       return;
     }
     
-    setLogLevels(session, req, LogLevel.ALL);
+    setLogLevels(session, request, LogLevel.ALL);
     
     SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd-HH-mm-ss");
     String logSessionId = format.format(new Date());
@@ -29,8 +29,8 @@ public class StartTracesCollectionHttpHandler extends AbstractTracesCollectionHa
     info.setStartTime(System.currentTimeMillis());
     info.setId(logSessionId);
     session.setCurrentTracesId(info);
-    resp.getWriter().write(logSessionId);
-    resp.getWriter().flush();
+    response.getWriter().write(logSessionId);
+    response.getWriter().flush();
   }
 
 }

@@ -223,7 +223,7 @@ public class HtmlReportGenerator {
                      // corrupted log file
       }
       line += "\n" + tmpLine;
-      System.out.println("Read line: " + line);
+//      System.out.println("Read line: " + line);
     }
 
     String[] parsedLine = line.split("(?<!\\\\)#");
@@ -231,7 +231,7 @@ public class HtmlReportGenerator {
     entry.time = SDF_WITH_TIME_ZONE.parse(parsedLine[0] + " " + parsedLine[1] + "00").getTime();
     entry.timeZone = TimeZone.getTimeZone(parsedLine[1] + "00");
     entry.severity = parsedLine[2];
-    entry.traceLocation = parsedLine[3];
+    entry.logger = parsedLine[3];
     entry.ACH = parsedLine[4];
     entry.user = parsedLine[5];
     entry.thread = parsedLine[6];
@@ -257,7 +257,7 @@ public class HtmlReportGenerator {
       builder.append(entryLine);
       builder.append("\n");
     }
-    entry.text = addLineBreaks(builder.toString());
+    entry.text = builder.toString();
     return entry;
   }
 
@@ -331,7 +331,7 @@ public class HtmlReportGenerator {
     long time;
     TimeZone timeZone;
     String severity;
-    String traceLocation;
+    String logger;
     String ACH;
     String user;
     String thread;
@@ -357,8 +357,8 @@ public class HtmlReportGenerator {
       row.append(severity);
       row.append("</td>");
 
-      row.append("<td class=\"traceLocation\">");
-      row.append(traceLocation);
+      row.append("<td class=\"logger\">");
+      row.append(convertTraceLocation(logger));
       row.append("</td>");
 
       row.append("<td class=\"ACH\">");
@@ -402,6 +402,27 @@ public class HtmlReportGenerator {
       row.append("</td>");
 
       return row.toString();
+    }
+
+    private String convertTraceLocation(String tr) {
+      StringBuilder builder = new StringBuilder();
+      builder.append("<span style=\"cursor: pointer\" class=\"loggerLine\" onclick=\"switchLoggerName(this)\" ondblclick=\"switchAllLoggers()\" alt=\"");
+      builder.append(tr);
+      builder.append("\">");
+      builder.append(shortenLoggerName(tr));
+      builder.append("</span>");
+      return builder.toString();
+    }
+
+    private String shortenLoggerName(String tr) {
+      String toReturn = null;
+      if (tr.length() > 30) {
+        toReturn = tr.substring(0, 15) + "..." + tr.substring(tr.length() - 15);
+        return toReturn;
+      } else {
+        return tr;
+      }
+      
     }
 
   }

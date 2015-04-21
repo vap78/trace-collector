@@ -21,7 +21,7 @@ public class StopTracesCollectionHttpHandler extends AbstractTracesCollectionHan
     super.service(request, response);
     Session session = getSession(request, response);
     if (session == null) {
-      response.sendRedirect(DO_LOGIN_ALIAS);
+      response.sendError(401);
       return;
     }
     try {
