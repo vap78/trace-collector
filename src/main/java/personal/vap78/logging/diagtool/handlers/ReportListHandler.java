@@ -55,9 +55,9 @@ public class ReportListHandler extends AbstractHttpHandler {
         if (lastDate != null) {
           text.append("<hr/>");
         }
-        text.append("Trace recodrings taken on <bold>");
+        text.append("Trace recordings taken on <strong>");
         text.append(outputFormat.format(time));
-        text.append("</bold>\n<br/><hr/>");
+        text.append("</strong>\n<br/><hr/>");
       }
       text.append("<a href=\"/getLog?name=");
       text.append(reports.get(time).fullName);
