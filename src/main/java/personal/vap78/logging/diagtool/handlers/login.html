@@ -81,12 +81,12 @@ input {
 	<option value="empty"></option> ${sessions}</select></p>
 	<form method="POST" action="doLogin" name="loginForm" onsubmit="return verifyForm()">
 		<table id="connectionDetails" style="width: 100%">
-			<tr><td class="left">HCP SDK folder:</td><td class="right"><input type="text" name="sdkPath" value="${sdkPath}"/></td></tr>
-			<tr><td class="left">Landscape host: </td> <td class="right"><input type="text" name="host" value="${host}"/></td></tr>
-			<tr><td class="left">Account:</td><td class="right"><input type="text" name="account" value="${account}"/></td></tr>
-			<tr><td class="left">Application:</td><td class="right"><input type="text" name="application" value="${application}"/></td></tr>
-			<tr><td class="left">User:</td><td class="right"><input type="text" name="user" value="${user}"/></td></tr>
-			<tr><td class="left">Password:</td><td class="right"><input type="password" name="password"/></td></tr>
+			<tr><td class="left">HCP SDK folder (*)</td><td class="right"><input type="text" name="sdkPath" value="${sdkPath}"/></td></tr>
+			<tr><td class="left">Landscape host (*)</td> <td class="right"><input type="text" name="host" value="${host}"/></td></tr>
+			<tr><td class="left">Account (*)</td><td class="right"><input type="text" name="account" value="${account}"/></td></tr>
+			<tr><td class="left">Application (*)</td><td class="right"><input type="text" name="application" value="${application}"/></td></tr>
+			<tr><td class="left">User (*)</td><td class="right"><input type="text" name="user" value="${user}"/></td></tr>
+			<tr><td class="left">Password (*)</td><td class="right"><input type="password" name="password"/></td></tr>
 			<tr><td class="left">Proxy (host:port):</td><td class="right"><input type="text" name="proxy" value="${proxy}"/></td></tr>
 			<tr><td class="left">Proxy user:</td><td class="right"><input type="text" name="proxyUser" value="${proxyUser}"/></td></tr>
 			<tr><td class="left">Proxy password:</td><td class="right"><input type="text" name="proxyPassword""/></td></tr>

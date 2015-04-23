@@ -1,7 +1,9 @@
 package personal.vap78.logging.diagtool;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileReader;
+import java.net.URI;
 import java.util.Properties;
 
 public class Main {
@@ -31,50 +33,11 @@ public class Main {
     LocalServer server = new LocalServer();
     
     server.start();
+    Desktop.getDesktop().browse(new URI("http://localhost:4242/main"));
     
     synchronized (Main.class) {
       Main.class.wait();
     }
-//    BufferedReader reader = executeConsoleTool(executablePath, executableRoot, SET_LOG_LEVEL_COMMAND, props);
-//    readFullyToSysOut(reader);
-//
-//    waitForInput();
-//    
-//    reader = executeConsoleTool(executablePath, executableRoot, LIST_LOGS_COMMAND, props);
-//    Map<String, LogFileDescriptor> files = parseListLogsOutput(reader);
-//    
-//    if (files.isEmpty()) {
-//      System.out.println("[ERROR] log list returned no files");
-//      return;
-//    }
-//
-//    for (LogFileDescriptor lfd : files.values()) {
-//      props.put(FILE_PARAM, lfd.name);
-//      reader = executeConsoleTool(executablePath, executableRoot, GET_LOG, props);
-//      readFullyToSysOut(reader);
-//    }
-//    
-//    props.setProperty(LEVEL_PARAM, "ERROR");
-//    
-//    HtmlReportGenerator generator = new HtmlReportGenerator(props, files, 0, 0);
-//    generator.generateHtmlReport();
   }
-
-  public static Properties getProps() {
-    return props;
-  }
-
-//  private static void waitForInput() {
-//    System.out.print("Please type 'ready' and press Enter when you have finished with your scenario: ");
-//    String line = null;
-//        
-//    while (true) {
-//      line = System.console().readLine();
-//      if ("ready".equals(line)) {
-//        break;
-//      }
-//    }
-//  }
-
 
 }

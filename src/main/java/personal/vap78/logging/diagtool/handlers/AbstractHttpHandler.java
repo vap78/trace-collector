@@ -10,7 +10,7 @@ import org.glassfish.grizzly.http.server.Response;
 
 import personal.vap78.logging.diagtool.Session;
 
-public class AbstractHttpHandler extends HttpHandler {
+public abstract class AbstractHttpHandler extends HttpHandler {
 
   public static final String DO_LOGIN_ALIAS = "/doLogin";
   public static final String TEXT_HTML = "text/html";

@@ -23,7 +23,7 @@ public class StartTracesCollectionHttpHandler extends AbstractTracesCollectionHa
     
     setLogLevels(session, request, LogLevel.ALL);
     
-    SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd-HH-mm-ss");
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
     String logSessionId = format.format(new Date());
     TraceCollectionInfo info = new TraceCollectionInfo();
     info.setStartTime(System.currentTimeMillis());
