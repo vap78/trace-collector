@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.http;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -8,12 +8,12 @@ import java.util.UUID;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 
-import personal.vap78.logging.diagtool.handlers.DownloadLogsHandler;
-import personal.vap78.logging.diagtool.handlers.LoginHttpHandler;
-import personal.vap78.logging.diagtool.handlers.MainHttpHandler;
-import personal.vap78.logging.diagtool.handlers.ReportListHandler;
-import personal.vap78.logging.diagtool.handlers.StartTracesCollectionHttpHandler;
-import personal.vap78.logging.diagtool.handlers.StopTracesCollectionHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.DownloadLogsHandler;
+import personal.vap78.logging.diagtool.http.handlers.LoginHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.MainHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.ReportListHandler;
+import personal.vap78.logging.diagtool.http.handlers.StartTracesCollectionHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.StopTracesCollectionHttpHandler;
 
 public class LocalServer {
   

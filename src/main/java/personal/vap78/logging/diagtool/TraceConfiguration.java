@@ -2,8 +2,11 @@ package personal.vap78.logging.diagtool;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,30 +16,37 @@ import java.util.Map;
 public class TraceConfiguration {
 
   private static Map<String, TraceConfiguration> configurations = new HashMap<>();
+  private String name;
+  private List<String> loggers;
   
   public static synchronized void addFromDirectory(File directory) throws IOException {
-    String[] files = directory.list();
+    File[] files = directory.listFiles();
     configurations.clear();
     
-    for (String name : files) {
-      if (name.startsWith("locations.")) {
-        int firstDot = name.indexOf(".");
-        int lastDot = name.lastIndexOf(".");
-        
-        if (firstDot + 1 < lastDot) {
-          String configName = name.substring(firstDot+1, lastDot);
-          List<String> locations = readFile(new File(directory, name));
-          TraceConfiguration cfg = new TraceConfiguration(configName, locations);
-          configurations.put(configName, cfg);
-        }
-      }
+    for (File file : files) {
+      addFromFile(file);
     }
   }
   
-  private static List<String> readFile(File file) throws IOException {
+  public synchronized static void addFromFile(File file) throws IOException {
+    String name = file.getName();
+    if (name.startsWith("locations.")) {
+      
+      int firstDot = name.indexOf(".");
+      int lastDot = name.lastIndexOf(".");
+      
+      if (firstDot + 1 < lastDot) {
+        String configName = name.substring(firstDot+1, lastDot);
+        
+        addFromInputStream(configName, new FileInputStream(file));
+      }
+    }
+  }
+
+  public synchronized static void addFromInputStream(String configName, InputStream input) throws IOException {
     BufferedReader reader = null;
     try {
-      reader = new BufferedReader(new FileReader(file));
+      reader = new BufferedReader(new InputStreamReader(input, Charset.forName("UTF-8")));
       
       List<String> locations = new ArrayList<>();
       String line = null;
@@ -44,13 +54,15 @@ public class TraceConfiguration {
       while ((line = reader.readLine()) != null) {
         locations.add(line);
       }
-    
-      return locations;
+      
+      TraceConfiguration cfg = new TraceConfiguration(configName, locations);
+      configurations.put(configName, cfg);
     } finally {
       if (reader != null) {
         reader.close();
       }
     }
+
   }
 
   public static synchronized void addConfiguration(TraceConfiguration cfg) {
@@ -65,20 +77,18 @@ public class TraceConfiguration {
     return configurations.get(name);
   }
 
-  private String name;
-  private List<String> locations;
   
   public TraceConfiguration(String name, List<String> locations) {
     this.name = name;
-    this.locations = locations;
+    this.loggers = locations;
   }
 
-  public List<String> getLocations() {
-    return locations;
+  public List<String> getLoggers() {
+    return loggers;
   }
   
-  public void setLocations(List<String> locations) {
-    this.locations = locations;
+  public void setLoggers(List<String> locations) {
+    this.loggers = locations;
   }
   
   public String getName() {
@@ -89,9 +99,9 @@ public class TraceConfiguration {
     this.name = name;
   }
   
-  public String getLocationsAsString() {
+  public String getLoggersAsString() {
     StringBuilder toReturn = new StringBuilder();
-    for (String s : locations) {
+    for (String s : loggers) {
       toReturn.append(s);
       toReturn.append("\n");
     }

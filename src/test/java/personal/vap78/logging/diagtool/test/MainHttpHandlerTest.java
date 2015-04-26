@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.easymock.EasyMock;
 import org.glassfish.grizzly.http.Cookie;
 import org.junit.Test;
@@ -14,10 +13,10 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import personal.vap78.logging.diagtool.Session;
 import personal.vap78.logging.diagtool.TraceConfiguration;
-import personal.vap78.logging.diagtool.handlers.AbstractHttpHandler;
-import personal.vap78.logging.diagtool.handlers.MainHttpHandler;
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.http.handlers.AbstractHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.MainHttpHandler;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Session.class, MainHttpHandler.class, File.class, TraceConfiguration.class})

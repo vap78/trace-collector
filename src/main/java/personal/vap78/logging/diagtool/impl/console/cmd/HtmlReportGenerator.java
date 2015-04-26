@@ -1,5 +1,4 @@
-package personal.vap78.logging.diagtool;
-
+package personal.vap78.logging.diagtool.impl.console.cmd;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,8 +16,6 @@ import org.apache.commons.io.IOUtils;
 
 import personal.vap78.logging.diagtool.LogFileDescriptor;
 import personal.vap78.logging.diagtool.http.Session;
-import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
-import personal.vap78.logging.diagtool.impl.console.cmd.GetLogsCommand;
 
 public class HtmlReportGenerator {
 

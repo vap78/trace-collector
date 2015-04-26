@@ -1,10 +1,13 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.impl.console.cmd;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
 
 public class GetLogsCommand extends AbstractLogCommand {
 

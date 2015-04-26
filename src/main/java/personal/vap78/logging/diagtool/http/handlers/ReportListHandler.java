@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool.handlers;
+package personal.vap78.logging.diagtool.http.handlers;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import personal.vap78.logging.diagtool.HtmlReportGenerator;
+import personal.vap78.logging.diagtool.impl.console.cmd.HtmlReportGenerator;
 
 public class ReportListHandler extends AbstractHttpHandler {
 

@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.impl.console.cmd;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,6 +8,10 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import personal.vap78.logging.diagtool.LogLevel;
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
 
 public class SetLogLevelCommand extends AbstractLogCommand {
   public static final String SET_LOG_LEVEL_COMMAND = "set-log-level";

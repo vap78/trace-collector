@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.utils;
 
 public class OSDetector {
 

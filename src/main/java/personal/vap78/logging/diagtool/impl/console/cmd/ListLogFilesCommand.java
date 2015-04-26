@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.impl.console.cmd;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -6,6 +6,10 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import personal.vap78.logging.diagtool.LogFileDescriptor;
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
 
 public class ListLogFilesCommand extends AbstractLogCommand {
 

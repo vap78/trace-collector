@@ -36,7 +36,7 @@
 				<directory>src/main/java</directory>
 				<includes>
 					<include> personal/vap78/logging/diagtool/*.html</include>
-					<include> personal/vap78/logging/diagtool/handlers/*.html</include>
+					<include> personal/vap78/logging/diagtool/http/handlers/*.html</include>
 				</includes>
 			</resource>
 		</resources>

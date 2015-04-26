@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool.handlers;
+package personal.vap78.logging.diagtool.http.handlers;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.glassfish.grizzly.http.server.Request;
 
-import personal.vap78.logging.diagtool.ListLoggersCommand;
 import personal.vap78.logging.diagtool.LogLevel;
-import personal.vap78.logging.diagtool.Session;
-import personal.vap78.logging.diagtool.SetLogLevelCommand;
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.impl.console.cmd.ListLoggersCommand;
+import personal.vap78.logging.diagtool.impl.console.cmd.SetLogLevelCommand;
 
 public abstract class AbstractTracesCollectionHandler extends AbstractHttpHandler {
 

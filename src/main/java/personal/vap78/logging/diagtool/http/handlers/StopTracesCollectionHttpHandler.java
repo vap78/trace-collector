@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool.handlers;
+package personal.vap78.logging.diagtool.http.handlers;
 
 import java.io.File;
 import java.util.Map;
@@ -6,13 +6,14 @@ import java.util.Map;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import personal.vap78.logging.diagtool.AbstractLogCommand;
-import personal.vap78.logging.diagtool.GetLogsCommand;
-import personal.vap78.logging.diagtool.HtmlReportGenerator;
-import personal.vap78.logging.diagtool.ListLogFilesCommand;
 import personal.vap78.logging.diagtool.LogFileDescriptor;
 import personal.vap78.logging.diagtool.LogLevel;
-import personal.vap78.logging.diagtool.Session;
+import personal.vap78.logging.diagtool.TraceCollectionInfo;
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
+import personal.vap78.logging.diagtool.impl.console.cmd.GetLogsCommand;
+import personal.vap78.logging.diagtool.impl.console.cmd.HtmlReportGenerator;
+import personal.vap78.logging.diagtool.impl.console.cmd.ListLogFilesCommand;
 
 public class StopTracesCollectionHttpHandler extends AbstractTracesCollectionHandler {
 

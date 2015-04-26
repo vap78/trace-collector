@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool.handlers;
+package personal.vap78.logging.diagtool.http.handlers;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -11,8 +11,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 
-import personal.vap78.logging.diagtool.HtmlReportGenerator;
-import personal.vap78.logging.diagtool.Session;
+import personal.vap78.logging.diagtool.impl.console.cmd.HtmlReportGenerator;
 
 public class DownloadLogsHandler extends AbstractHttpHandler {
 

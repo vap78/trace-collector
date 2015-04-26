@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool.handlers;
+package personal.vap78.logging.diagtool.http.handlers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +8,7 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import personal.vap78.logging.diagtool.Session;
+import personal.vap78.logging.diagtool.http.Session;
 
 public abstract class AbstractHttpHandler extends HttpHandler {
 

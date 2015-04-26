@@ -22,12 +22,12 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import personal.vap78.logging.diagtool.AbstractLogCommand;
-import personal.vap78.logging.diagtool.CommandExecutionException;
-import personal.vap78.logging.diagtool.ListLogFilesCommand;
 import personal.vap78.logging.diagtool.LogFileDescriptor;
-import personal.vap78.logging.diagtool.handlers.AbstractHttpHandler;
-import personal.vap78.logging.diagtool.handlers.LoginHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.AbstractHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.LoginHttpHandler;
+import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
+import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
+import personal.vap78.logging.diagtool.impl.console.cmd.ListLogFilesCommand;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({File.class, FileInputStream.class, BufferedReader.class, 

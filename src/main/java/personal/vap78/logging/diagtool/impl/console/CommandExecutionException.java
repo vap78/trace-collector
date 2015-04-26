@@ -1,4 +1,6 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.impl.console;
+
+import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
 
 public class CommandExecutionException extends Exception {
 

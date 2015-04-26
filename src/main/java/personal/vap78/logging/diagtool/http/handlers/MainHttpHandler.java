@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool.handlers;
+package personal.vap78.logging.diagtool.http.handlers;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.List;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import personal.vap78.logging.diagtool.Session;
 import personal.vap78.logging.diagtool.TraceConfiguration;
+import personal.vap78.logging.diagtool.http.Session;
 
 public class MainHttpHandler extends AbstractHttpHandler {
 
@@ -50,7 +50,7 @@ public class MainHttpHandler extends AbstractHttpHandler {
         optionsBuilder.append(cfgName).append("</option>").append("\n");
         jsArrayBuilder.append("traceConfigs['").append(cfgName).append("'] = ['");
         TraceConfiguration cfg = TraceConfiguration.getByName(cfgName);
-        List<String> locations = cfg.getLocations();
+        List<String> locations = cfg.getLoggers();
         for (int i = 0; i < locations.size(); i++) {
           jsArrayBuilder.append(locations.get(i)).append("'");
           if (i == locations.size() - 1) {
@@ -63,7 +63,7 @@ public class MainHttpHandler extends AbstractHttpHandler {
       
       replaceAll(content, "${incidents}", optionsBuilder.toString());
       replaceAll(content, "//${jsLocations}", jsArrayBuilder.toString());
-      replaceAll(content, "${locations}",  TraceConfiguration.getByName(traceConfigurations.get(0)).getLocationsAsString());
+      replaceAll(content, "${locations}",  TraceConfiguration.getByName(traceConfigurations.get(0)).getLoggersAsString());
     } else {
       replaceAll(content, "${incidents}", "");
       replaceAll(content, "${locations}", "");

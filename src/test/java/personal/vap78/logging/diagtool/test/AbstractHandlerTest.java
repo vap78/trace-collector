@@ -7,7 +7,7 @@ import org.easymock.EasyMock;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import personal.vap78.logging.diagtool.handlers.AbstractHttpHandler;
+import personal.vap78.logging.diagtool.http.handlers.AbstractHttpHandler;
 
 public class AbstractHandlerTest {
   

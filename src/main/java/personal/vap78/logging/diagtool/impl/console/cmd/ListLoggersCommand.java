@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.impl.console.cmd;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
+
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
 
 public class ListLoggersCommand extends AbstractLogCommand {
 

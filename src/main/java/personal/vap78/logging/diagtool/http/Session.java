@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.http;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import personal.vap78.logging.diagtool.handlers.TraceCollectionInfo;
+import personal.vap78.logging.diagtool.LogFileDescriptor;
+import personal.vap78.logging.diagtool.TraceCollectionInfo;
+import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
 
 public class Session {
 

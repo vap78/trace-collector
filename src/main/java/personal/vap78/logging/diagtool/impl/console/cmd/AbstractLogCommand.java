@@ -1,4 +1,4 @@
-package personal.vap78.logging.diagtool;
+package personal.vap78.logging.diagtool.impl.console.cmd;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +10,10 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
+
+import personal.vap78.logging.diagtool.http.Session;
+import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
+import personal.vap78.logging.diagtool.utils.OSDetector;
 
 public abstract class AbstractLogCommand {
 

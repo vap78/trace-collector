@@ -4,8 +4,11 @@ import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,7 +42,7 @@ public class TraceConfigurationTest {
     assertTrue(names.contains("test"));
     
     TraceConfiguration cfg = TraceConfiguration.getByName("1");
-    List<String> locations = cfg.getLocations();
+    List<String> locations = cfg.getLoggers();
     assertEquals(locations.size(), testLocations.length);
     for (String tLoc : testLocations) {
       assertTrue(locations.contains(tLoc));
@@ -52,14 +55,18 @@ public class TraceConfigurationTest {
     File mockedFolder = EasyMock.createMock(File.class);
     
     File[] files = new File[fileList.length];
-    EasyMock.expect(mockedFolder.list()).andReturn(fileList).anyTimes();
+    EasyMock.expect(mockedFolder.listFiles()).andReturn(files).anyTimes();
     
     for (int i = 0; i < fileList.length; i++) {
       files[i] = EasyMock.createMock(File.class);
       PowerMock.expectNew(File.class, mockedFolder, fileList[i]).andReturn(files[i]).anyTimes();
+      EasyMock.expect(files[i].getName()).andReturn(fileList[i]).anyTimes();
+      EasyMock.expect(files[i].getPath()).andReturn(fileList[i]).anyTimes();
       if (fileList[i].contains("locations") && fileList[i].indexOf(".") + 1 < fileList[i].lastIndexOf(".")) {
-        FileReader mockReader = EasyMock.createMock(FileReader.class);
-        PowerMock.expectNew(FileReader.class, files[i]).andReturn(mockReader).once();
+        FileInputStream mockInputStream = EasyMock.createMock(FileInputStream.class);
+        PowerMock.expectNew(FileInputStream.class, files[i]).andReturn(mockInputStream).once();
+        InputStreamReader mockISReader = EasyMock.createMock(InputStreamReader.class);
+        PowerMock.expectNew(InputStreamReader.class, mockInputStream, Charset.forName("UTF-8")).andReturn(mockISReader);
         
         BufferedReader mockBufferedReader = EasyMock.createMock(BufferedReader.class);
         IExpectationSetters<String> readerContent = EasyMock.expect(mockBufferedReader.readLine());
@@ -69,15 +76,15 @@ public class TraceConfigurationTest {
         readerContent.andReturn(null);
         mockBufferedReader.close();
         EasyMock.expectLastCall().once();
-        PowerMock.expectNew(BufferedReader.class, mockReader).andReturn(mockBufferedReader).once();
+        PowerMock.expectNew(BufferedReader.class, mockISReader).andReturn(mockBufferedReader).once();
         
-        EasyMock.replay(mockReader, mockBufferedReader);
+        EasyMock.replay(mockInputStream, mockBufferedReader);
       }
       EasyMock.replay(files[i]);
     }
     EasyMock.replay(mockedFolder);
     
-    PowerMock.replay(File.class, FileReader.class, BufferedReader.class, TraceConfiguration.class);
+    PowerMock.replay(File.class, FileInputStream.class, InputStreamReader.class, BufferedReader.class, TraceConfiguration.class);
     return mockedFolder;
   }
 }
