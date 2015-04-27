@@ -57,6 +57,9 @@ public class LoginHttpHandler extends AbstractHttpHandler {
     try {
       command.executeConsoleTool();
       command.printConsoleToSystemOut();
+      if (!command.isExecutionSuccessful()) {
+        throw new CommandExecutionException(command, "Command execution failed");
+      }
       storeProperties(session);
 
       Cookie sessionCookie = new Cookie(SESSION_ID, uuid.toString());

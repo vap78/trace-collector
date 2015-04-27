@@ -39,7 +39,7 @@ public class ListLoggersCommand extends AbstractLogCommand {
   }
 
   @Override
-  protected boolean isExecutionSuccessful() {
+  public boolean isExecutionSuccessful() {
     return consoleOutput.indexOf("[list-loggers] operation is successful.") > -1;
   }
 

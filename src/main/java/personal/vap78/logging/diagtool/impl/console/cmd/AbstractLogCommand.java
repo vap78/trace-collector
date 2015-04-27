@@ -152,7 +152,7 @@ protected abstract String getCommandName();
 
   protected abstract void addCommandSpecificParameters();
 
-  protected abstract boolean isExecutionSuccessful();
+  public abstract boolean isExecutionSuccessful();
   
   public String getConsoleOutput() {
     if (consoleOutput == null) {

@@ -30,7 +30,7 @@ public class ListLogFilesCommand extends AbstractLogCommand {
   }
   
   @Override
-  protected boolean isExecutionSuccessful() {
+  public boolean isExecutionSuccessful() {
     return consoleOutput != null && consoleOutput.indexOf("[list-logs] operation is successful.") != -1;
   }
   

@@ -15,8 +15,6 @@ public class Main {
 
   public static final String DEFAULT_PROPERTIES_FILE_NAME = "default.properties";
 
-  private static Properties props;
-
   public static void main(String[] args) throws Exception {
     AutomaticSessionProperties autoSession = parseArguments(args);
 
