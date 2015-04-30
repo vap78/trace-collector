@@ -11,7 +11,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 
-import personal.vap78.logging.diagtool.impl.console.cmd.HtmlReportGenerator;
+import personal.vap78.logging.diagtool.HtmlReportGenerator;
 
 public class DownloadLogsHandler extends AbstractHttpHandler {
 

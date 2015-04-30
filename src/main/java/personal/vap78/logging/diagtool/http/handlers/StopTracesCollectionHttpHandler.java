@@ -1,19 +1,16 @@
 package personal.vap78.logging.diagtool.http.handlers;
 
 import java.io.File;
-import java.util.Map;
 
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import personal.vap78.logging.diagtool.LogFileDescriptor;
-import personal.vap78.logging.diagtool.LogLevel;
+import personal.vap78.logging.diagtool.HtmlReportGenerator;
 import personal.vap78.logging.diagtool.TraceCollectionInfo;
+import personal.vap78.logging.diagtool.TraceConfiguration;
+import personal.vap78.logging.diagtool.api.StopTracesOperation;
 import personal.vap78.logging.diagtool.http.Session;
-import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
-import personal.vap78.logging.diagtool.impl.console.cmd.GetLogsCommand;
-import personal.vap78.logging.diagtool.impl.console.cmd.HtmlReportGenerator;
-import personal.vap78.logging.diagtool.impl.console.cmd.ListLogFilesCommand;
+import personal.vap78.logging.diagtool.impl.console.ConsoleOperationsFactory;
 
 public class StopTracesCollectionHttpHandler extends AbstractTracesCollectionHandler {
 
@@ -29,26 +26,21 @@ public class StopTracesCollectionHttpHandler extends AbstractTracesCollectionHan
       TraceCollectionInfo info = session.getCurrentTracesCollectionInfo();
       info.setEndTime(System.currentTimeMillis());
   
-      setLogLevels(session, request, LogLevel.ERROR);
-      
-      ListLogFilesCommand listLogFiles = new ListLogFilesCommand(session);
-      listLogFiles.executeConsoleTool();
-      listLogFiles.printConsoleToSystemOut();
-      Map<String, LogFileDescriptor> logFiles = listLogFiles.parseListLogsOutput();
-      
-      GetLogsCommand getLogs = new GetLogsCommand(session, logFiles.get(AbstractLogCommand.LJS_TRACE).getName());
-      getLogs.executeConsoleTool();
-      getLogs.printConsoleToSystemOut();
-      
-      if (!getLogs.isExecutionSuccessful()) {
-        response.sendError(500, "Failed to retrieve log files after the trace collector has stopped");
+      StopTracesOperation stopTracesOperation = ConsoleOperationsFactory.getStopTracesOperation(session);
+      TraceConfiguration configuration = new TraceConfiguration("temp", readLoggersToList(request));
+      stopTracesOperation.execute(configuration);
+      if (!stopTracesOperation.isSuccessful()) {
+        System.out.println("Failed to stop the trace collector");
+        response.sendError(500);
         return;
       }
       
-      HtmlReportGenerator reportGenerator = new HtmlReportGenerator(session, logFiles, info.getStartTime(), info.getEndTime());
-      File reportFile = reportGenerator.generateHtmlReport();
-      response.getWriter().write(reportFile.getName());
-      session.addCollectedTraceFile(reportFile.getName());
+      String reportFile = stopTracesOperation.getReportFileName();
+      
+      HtmlReportGenerator reportGenerator = new HtmlReportGenerator(session, reportFile, info.getStartTime(), info.getEndTime());
+      File reportFileHtml = reportGenerator.generateHtmlReport();
+      response.getWriter().write(reportFileHtml.getName());
+      session.addCollectedTraceFile(reportFileHtml.getName());
     } catch (Exception e) {
       e.printStackTrace();
       response.sendError(500);

@@ -12,7 +12,7 @@ public class CommandExecutionException extends Exception {
     this.command = command;
   }
   
-  CommandExecutionException(AbstractLogCommand command, String message, Throwable error) {
+  public CommandExecutionException(AbstractLogCommand command, String message, Throwable error) {
     super(message, error);
     this.command = command;
   }

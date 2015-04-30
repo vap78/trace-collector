@@ -1,8 +1,11 @@
 package personal.vap78.logging.diagtool.impl.console.cmd;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,40 +37,40 @@ public class ListLogFilesCommand extends AbstractLogCommand {
     return consoleOutput != null && consoleOutput.indexOf("[list-logs] operation is successful.") != -1;
   }
   
-  public Map<String, LogFileDescriptor> parseListLogsOutput() throws Exception {
+  public Map<String, LogFileDescriptor> parseListLogsOutput() {
     Map<String, LogFileDescriptor> files = new HashMap<String, LogFileDescriptor>();
     BufferedReader reader = new BufferedReader(new StringReader(getConsoleOutput()));
     String line = null;
     boolean success = false;
-    while ((line = reader.readLine()) != null) {
-      line = line.trim();
-      if (line.startsWith("[list-logs] operation is successful")) {
-        success = true;
-        continue;
-      }
+    try {
+      while ((line = reader.readLine()) != null) {
+        line = line.trim();
+        if (line.startsWith("[list-logs] operation is successful")) {
+          success = true;
+          continue;
+        }
 
-      if (success && line.endsWith(".log")) {
-        String[] parts = line.split(" ");
-        String fileName = parts[parts.length - 1];
-        long time = getFileTime(parts);
-        String type = getType(fileName);
-        LogFileDescriptor lfd = files.get(type);
-        if (lfd == null) {
-          lfd = new LogFileDescriptor();
-          lfd.setTime(time);
-          lfd.setType(type);
-          lfd.setName(fileName);
-          files.put(lfd.getType(), lfd);
-        } else if (lfd.getType().equals(type) && lfd.getTime() < time) {
-          lfd.setName(fileName);
+        if (success && line.endsWith(".log")) {
+          String[] parts = line.split(" ");
+          String fileName = parts[parts.length - 1];
+          long time = getFileTime(fileName);
+          String type = getType(fileName);
+          LogFileDescriptor lfd = files.get(type);
+          if (lfd == null) {
+            lfd = new LogFileDescriptor();
+            lfd.setTime(time);
+            lfd.setType(type);
+            lfd.setName(fileName);
+            files.put(lfd.getType(), lfd);
+          } else if (lfd.getType().equals(type) && lfd.getTime() < time) {
+            lfd.setName(fileName);
+          }
         }
       }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
 
-    if (!success) {
-      throw new CommandExecutionException(this, "Failed to execute command "+ LIST_LOGS_COMMAND);
-    }
-    
     return files;
   }
   
@@ -80,10 +83,21 @@ public class ListLogFilesCommand extends AbstractLogCommand {
     return "other";
   }
 
-  private long getFileTime(String[] parts) throws Exception {
-    String dateStr = parts[0] + " " + parts[1];
+  private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+  
+  private long getFileTime(String fileName) {
+    String[] fileNameParts = fileName.split("_");
+    String dateStr = fileNameParts[fileNameParts.length - 1];
+    if (dateStr.endsWith(".log")) {
+      dateStr = dateStr.substring(0, dateStr.indexOf(".log"));
+    }
     
-    Date date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).parse(dateStr);
+    Date date = null;
+    try {
+      date = FORMAT.parse(dateStr);
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+    }
     
     return date.getTime();
   }

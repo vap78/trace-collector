@@ -62,7 +62,7 @@ public abstract class AbstractLogCommand {
     System.out.println();
   }
   
-  public void executeConsoleTool() throws IOException, CommandExecutionException {
+  public void executeConsoleTool() throws CommandExecutionException {
     addCommonCommandParameters();
     
     addCommandSpecificParameters();
@@ -81,17 +81,21 @@ public abstract class AbstractLogCommand {
       setProxy(environmentMap);
     }
     pb.redirectErrorStream(true);
-    Process p = pb.start();
-
-    System.out.println("=================================================");
-    System.out.println("Executing neo console tool operation " + getCommandName());
-    System.out.println("=================================================");
-    BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-    
-    String line = null;
-    consoleOutput = new StringBuilder();
-    while ((line = input.readLine()) != null) {
-      consoleOutput.append(line).append("\n");
+    try {
+      Process p = pb.start();
+  
+      System.out.println("=================================================");
+      System.out.println("Executing neo console tool operation " + getCommandName());
+      System.out.println("=================================================");
+      BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      
+      String line = null;
+      consoleOutput = new StringBuilder();
+      while ((line = input.readLine()) != null) {
+        consoleOutput.append(line).append("\n");
+      }
+    } catch (IOException e) {
+      throw new CommandExecutionException(this, e.getMessage(), e);
     }
   }
 
@@ -200,7 +204,7 @@ protected abstract String getCommandName();
     }
   }
   
-  public void printConsoleToSystemOut() throws Exception {
+  public void printConsoleToSystemOut() {
     String line = null;
     if (consoleOutput == null) {
       System.out.println("Command output not present");
@@ -213,6 +217,9 @@ protected abstract String getCommandName();
         System.out.print("[" + this.getClass().getSimpleName() + "]>> ");
         System.out.println(line);
       }
+    } catch (IOException e) {
+      // should not happen
+      throw new RuntimeException(e);
     } finally {
       IOUtils.closeQuietly(reader);
     }

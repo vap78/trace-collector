@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import personal.vap78.logging.diagtool.impl.console.cmd.HtmlReportGenerator;
+import personal.vap78.logging.diagtool.HtmlReportGenerator;
 
 public class ReportListHandler extends AbstractHttpHandler {
 

@@ -27,10 +27,15 @@ public class GetLogsCommand extends AbstractLogCommand {
   }
   
   @Override
-  public void executeConsoleTool() throws IOException, CommandExecutionException {
+  public void executeConsoleTool() throws CommandExecutionException {
     File logStore = getLogStoreDirectory();
     if (logStore.exists()) {
-      FileUtils.deleteDirectory(getLogStoreDirectory());
+      try {
+        FileUtils.deleteDirectory(logStore);
+      } catch (IOException e) {
+        System.out.println("Failed to delete directory: " + logStore.getAbsolutePath());
+        throw new CommandExecutionException(this, e.getMessage(), e);
+      }
     }
     logStore.mkdir();
     

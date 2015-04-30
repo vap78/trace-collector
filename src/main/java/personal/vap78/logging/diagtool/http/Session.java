@@ -108,8 +108,8 @@ public class Session {
     return currentTraceCollectionInfo;
   }
 
-  public void setCurrentTracesId(TraceCollectionInfo info) {
-    this.currentTraceCollectionInfo = info;
+  public void setCurrentTraceCollectionInfo(TraceCollectionInfo currentTraceCollectionInfo) {
+    this.currentTraceCollectionInfo = currentTraceCollectionInfo;
   }
   
   public List<String> getCollectedTraceFiles() {
@@ -119,5 +119,6 @@ public class Session {
   public void addCollectedTraceFile(String name) {
     collectedTraceFiles.add(name);
   }
+
 
 }

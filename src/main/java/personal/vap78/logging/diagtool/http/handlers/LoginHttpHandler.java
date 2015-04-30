@@ -18,9 +18,11 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 
+import personal.vap78.logging.diagtool.api.LoginOperation;
 import personal.vap78.logging.diagtool.http.LocalServer;
 import personal.vap78.logging.diagtool.http.Session;
 import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
+import personal.vap78.logging.diagtool.impl.console.ConsoleOperationsFactory;
 import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
 import personal.vap78.logging.diagtool.impl.console.cmd.ListLogFilesCommand;
 
@@ -48,26 +50,18 @@ public class LoginHttpHandler extends AbstractHttpHandler {
     Properties props = new Properties();
     Map<String, String> params = LocalServer.convertParameterMap(req.getParameterMap());
     props.putAll(params);
+
+    LoginOperation loginOperation = ConsoleOperationsFactory.getLoginOperation(props);
     
-
-    UUID uuid = LocalServer.createUUID();
-    Session session = Session.createSession(uuid.toString(), props);
-
-    ListLogFilesCommand command = new ListLogFilesCommand(session);
-    try {
-      command.executeConsoleTool();
-      command.printConsoleToSystemOut();
-      if (!command.isExecutionSuccessful()) {
-        throw new CommandExecutionException(command, "Command execution failed");
-      }
-      storeProperties(session);
-
-      Cookie sessionCookie = new Cookie(SESSION_ID, uuid.toString());
+    loginOperation.execute(null);
+    
+    if (loginOperation.isSuccessful()) {
+      Session session = loginOperation.getSession();
+      Cookie sessionCookie = new Cookie(SESSION_ID, session.getId());
       sessionCookie.setMaxAge(THIRTY_MINUTES);
       resp.addCookie(sessionCookie);
       resp.sendRedirect("/main");
-    } catch (CommandExecutionException e) {
-      Session.deleteSession(uuid.toString());
+    } else {
       printFailedLogin(props, resp);
     }
   }

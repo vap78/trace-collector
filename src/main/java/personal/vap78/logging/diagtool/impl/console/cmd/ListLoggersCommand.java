@@ -26,7 +26,7 @@ public class ListLoggersCommand extends AbstractLogCommand {
   }
   
   @Override
-  public void executeConsoleTool() throws IOException, CommandExecutionException {
+  public void executeConsoleTool() throws CommandExecutionException {
     super.executeConsoleTool();
     if (!isExecutionSuccessful()) {
       throw new CommandExecutionException(this, "Failed to list the loggers");
@@ -54,28 +54,33 @@ public class ListLoggersCommand extends AbstractLogCommand {
   }
 
   
-  private void parseLoggerList() throws IOException {
+  private void parseLoggerList() {
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new CharSequenceReader(consoleOutput));
       String line = null;
       boolean loggersStarted = false;
-      while ((line = reader.readLine()) != null) {
-        if (line.equals("[list-loggers] operation is successful.")) {
-          loggersStarted = true;
-          continue;
-        }
-        if (loggersStarted && isLoggerLine(line)) {
-          line = line.trim();
-          int lastSpace = line.lastIndexOf(" ");
-          if (lastSpace > -1) {
-            String traceLocation = line.substring(lastSpace + 1);
-            loggers.add(traceLocation);
+      try {
+        while ((line = reader.readLine()) != null) {
+          if (line.equals("[list-loggers] operation is successful.")) {
+            loggersStarted = true;
+            continue;
+          }
+          if (loggersStarted && isLoggerLine(line)) {
+            line = line.trim();
+            int lastSpace = line.lastIndexOf(" ");
+            if (lastSpace > -1) {
+              String traceLocation = line.substring(lastSpace + 1);
+              loggers.add(traceLocation);
+            }
           }
         }
+      } finally {
+        IOUtils.closeQuietly(reader);
       }
-    } finally {
-      IOUtils.closeQuietly(reader);
+    } catch (IOException e) {
+      // should not happen - we are not performing any actual I/O operations with the reader
+      throw new RuntimeException(e);
     }
   }
 

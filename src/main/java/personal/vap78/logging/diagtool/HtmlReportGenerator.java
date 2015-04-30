@@ -1,8 +1,8 @@
 package personal.vap78.logging.diagtool;
 
-
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,12 +10,13 @@ import java.io.PrintStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 
-import personal.vap78.logging.diagtool.LogFileDescriptor;
 import personal.vap78.logging.diagtool.http.Session;
 import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
 import personal.vap78.logging.diagtool.impl.console.cmd.GetLogsCommand;
@@ -26,24 +27,22 @@ public class HtmlReportGenerator {
   public static final String REPORTS_FOLDER = "reports";
   private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy MM dd HH:mm:ss");
   private static final SimpleDateFormat SDF_WITH_TIME_ZONE = new SimpleDateFormat("yyyy MM dd HH:mm:ss z");
-  private Map<String, LogFileDescriptor> logFiles;
+  private String logFile;
   private long endTime;
   private long startTime;
   private boolean isTrialAccount;
   private Session session;
 
-  // private HeaderDescriptor headerDescriptor;
-
-  public HtmlReportGenerator(Session session, Map<String, LogFileDescriptor> logFiles, long startTime, long endTime) {
+  public HtmlReportGenerator(Session session, String logFile, long startTime, long endTime) {
     this.session = session;
-    this.logFiles = logFiles;
+    this.logFile = logFile;
     this.startTime = startTime;
     this.endTime = endTime;
     isTrialAccount = session.getHost().contains("hanatrial");
   }
 
   public File generateHtmlReport() throws IOException, ParseException {
-    String ljsLogPath = GetLogsCommand.LOGS_DOWNLOAD_DIRECTORY + File.separator + logFiles.get(AbstractLogCommand.LJS_TRACE).getName();
+    String ljsLogPath = GetLogsCommand.LOGS_DOWNLOAD_DIRECTORY + File.separator + logFile;
     
     String ljsReport = session.getAccount() + "_" + session.getApplication() + "_" + session.getCurrentTracesCollectionInfo().getId() + ".html";
     PrintStream ljsOutput = null;
@@ -157,7 +156,7 @@ public class HtmlReportGenerator {
         ljsOutput.println("Host: <b>" + session.getHost() + "</b><br/>");
         ljsOutput.println("Account: <b>" + session.getAccount() + "</b><br/>");
         ljsOutput.println("Application: <b>" + session.getApplication() + "</b><br/>");
-        ljsOutput.println("File: <b>" + logFiles.get(AbstractLogCommand.LJS_TRACE).getName() + "</b><br/>");
+        ljsOutput.println("File: <b>" + logFile + "</b><br/>");
         ljsOutput.println("Start time: <b>" + SDF_WITH_TIME_ZONE.format(startTime) + "</b><br/>");
         ljsOutput.println("End time: <b>" + SDF_WITH_TIME_ZONE.format(endTime) + "</b><br/>");
         ljsOutput.println("<hr>");
@@ -232,6 +231,7 @@ public class HtmlReportGenerator {
 //      System.out.println("Read line: " + line);
     }
 
+    line = line.trim();
     String[] parsedLine = line.split("(?<!\\\\)#");
     LjsLogEntry entry = new LjsLogEntry();
     entry.time = SDF_WITH_TIME_ZONE.parse(parsedLine[0] + " " + parsedLine[1] + "00").getTime();
@@ -305,21 +305,17 @@ public class HtmlReportGenerator {
     }
   }
 
-//  public static void main(String[] args) throws Exception {
-//    Properties props = new Properties();
-//    props.load(new FileInputStream("/Users/vap78/develop/neo-java-web-sdk-2.16.5.1/tools/default.properties"));
-//    Map<String, LogFileDescriptor> map = new HashMap<String, LogFileDescriptor>();
-//
-//    LogFileDescriptor lfd = new LogFileDescriptor();
-//    lfd.setName("ljs_trace_ffe4b7d_2015-02-08.log");
-//    lfd.setType("ljs");
-//
-//    map.put(AbstractLogCommand.LJS_TRACE, lfd);
-//    Session session = new Session("testid", props);
-//    HtmlReportGenerator gen = new HtmlReportGenerator(session, map, 0, 0);
-//
-//    gen.generateHtmlReport();
-//  }
+  public static void main(String[] args) throws Exception {
+    Properties props = new Properties();
+    props.load(new FileInputStream("C:/cloud/1.74.20/tools/deploy_oauth.properties"));
+    Session session = new Session("testid", props);
+    TraceCollectionInfo traceCollectionInfo = new TraceCollectionInfo();
+    traceCollectionInfo.setId("test");
+    session.setCurrentTraceCollectionInfo(traceCollectionInfo);
+    HtmlReportGenerator gen = new HtmlReportGenerator(session, "ljs_trace_1b440fa_2015-04-30.log", 0, Long.MAX_VALUE);
+
+    gen.generateHtmlReport();
+  }
 
   static class HeaderDescriptor {
     String columnSeparator;
@@ -430,7 +426,6 @@ public class HtmlReportGenerator {
       }
       
     }
-
   }
 
 }
