@@ -42,7 +42,7 @@ public class StopTracesConsoleImpl extends BaseStartStopOperation implements Sto
         reportFileName = logFileToDownload;
         successful = true;
       } else {
-        throw new CommandExecutionException(listLogFiles, "Faile to download the log file");
+        throw new CommandExecutionException(listLogFiles, "Failed to download the log file");
       }
     } catch (CommandExecutionException e) {
       e.printStackTrace();

@@ -1,7 +1,6 @@
 package personal.vap78.logging.diagtool.test;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,17 +21,17 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import personal.vap78.logging.diagtool.LogFileDescriptor;
-import personal.vap78.logging.diagtool.http.handlers.AbstractHttpHandler;
+import personal.vap78.logging.diagtool.http.Session;
 import personal.vap78.logging.diagtool.http.handlers.LoginHttpHandler;
-import personal.vap78.logging.diagtool.impl.console.CommandExecutionException;
+import personal.vap78.logging.diagtool.impl.console.ConsoleOperationsFactory;
+import personal.vap78.logging.diagtool.impl.console.LoginOperationConsoleImpl;
 import personal.vap78.logging.diagtool.impl.console.cmd.AbstractLogCommand;
 import personal.vap78.logging.diagtool.impl.console.cmd.ListLogFilesCommand;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({File.class, FileInputStream.class, BufferedReader.class, 
                    LoginHttpHandler.class, ListLogFilesCommand.class, 
-                   OutputStreamWriter.class, FileOutputStream.class})
+                   OutputStreamWriter.class, FileOutputStream.class, ConsoleOperationsFactory.class})
 public class LoginHttpHandlerTest extends AbstractHandlerTest {
 
   @Test
@@ -180,24 +179,18 @@ public class LoginHttpHandlerTest extends AbstractHandlerTest {
     parameterMap.put(AbstractLogCommand.USER_PARAM, new String[] {"user1"});
     EasyMock.expect(holder.mockRequest.getParameterMap()).andReturn(parameterMap);
     
-    ListLogFilesCommand mockListLogs = EasyMock.createMock(ListLogFilesCommand.class);
-    PowerMock.expectNew(ListLogFilesCommand.class, EasyMock.anyObject()).andReturn(mockListLogs);
+    LoginOperationConsoleImpl loginOperation = EasyMock.createMock(LoginOperationConsoleImpl.class);
+    PowerMock.mockStatic(ConsoleOperationsFactory.class);
+    EasyMock.expect(ConsoleOperationsFactory.getLoginOperation(EasyMock.<Properties>anyObject())).andReturn(loginOperation);
     
+    loginOperation.execute(null);
+    EasyMock.expectLastCall();
+
     if (failLogin) {
-      mockListLogs.executeConsoleTool();
-      EasyMock.expectLastCall().andThrow(new CommandExecutionException(mockListLogs, "testing failed login"));
+      EasyMock.expect(loginOperation.isSuccessful()).andReturn(false);
     } else {
-      mockListLogs.executeConsoleTool();
-      EasyMock.expectLastCall();
-      EasyMock.expect(mockListLogs.getConsoleOutput()).andReturn("");
-//      EasyMock.expect(mockListLogs.parseListLogsOutput()).andReturn(new HashMap<String, LogFileDescriptor>());
-      mockListLogs.printConsoleToSystemOut();
-      EasyMock.expectLastCall();
-      
-      FileOutputStream mockFos = EasyMock.createMock(FileOutputStream.class);
-      PowerMock.expectNew(FileOutputStream.class, "host1_account1_application1.session").andReturn(mockFos);
-      OutputStreamWriter mockWriter = EasyMock.createMock(OutputStreamWriter.class);
-      PowerMock.expectNew(OutputStreamWriter.class, mockFos, AbstractHttpHandler.UTF_8).andReturn(mockWriter);
+      EasyMock.expect(loginOperation.isSuccessful()).andReturn(true);
+      EasyMock.expect(loginOperation.getSession()).andReturn(new Session("test", null));
       
       holder.capturedCookie = EasyMock.<Cookie>newCapture();
       holder.mockResponse.addCookie(EasyMock.capture(holder.capturedCookie));
@@ -209,8 +202,8 @@ public class LoginHttpHandlerTest extends AbstractHandlerTest {
     
     EasyMock.expect(holder.mockRequest.getMethod()).andReturn(Method.POST).anyTimes();
 
-    EasyMock.replay(holder.mockRequest, holder.mockResponse, mockListLogs);
-    PowerMock.replay(ListLogFilesCommand.class, OutputStreamWriter.class, FileOutputStream.class);
+    EasyMock.replay(holder.mockRequest, holder.mockResponse, loginOperation);
+    PowerMock.replay(LoginOperationConsoleImpl.class, ConsoleOperationsFactory.class, OutputStreamWriter.class, FileOutputStream.class);
     return holder;
   }
   
